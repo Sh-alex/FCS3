@@ -1,14 +1,7 @@
 (function(){
     var w = 800;
     var h = 400;
-
-
-    var svg = d3.selectAll(".svg")
-        .append("svg")
-        .attr("width", w)
-        .attr("height", h)
-        .attr("class", "svg");
-
+    var chartTitle = "Діаграма послідовності обробки деталей";
     var serverResp = [
         {
             "gvm": 1,
@@ -83,6 +76,21 @@
             "end": 17
         }
     ];
+    var chartContainer = ".gantt-chart-container";
+    var tooltipFieldsNames =  {
+        task: "Деталь",
+        type: "ГВМ",
+        startTime: "Початок",
+        endTime: "Кінець",
+        details: "Опис"
+    };
+
+
+    var svg = d3.selectAll(chartContainer)
+        .append("svg")
+        .attr("width", w)
+        .attr("height", h)
+        .attr("class", "svg");
 
     function msNumToString(num) {
         if(num > 999){
@@ -97,44 +105,40 @@
         else
             return "00" + num;
     }
-    
+
     var taskArray = serverResp.map(el => {
         return {
             task: "Деталь " + el.detail,
             type: "ГВМ "+ el.gvm,
-            startTime: /*"2000-01-01T00:00:00" +*/ msNumToString(el.start),
-            endTime: /*"2000-01-01T00:00:00." +*/ msNumToString(el.end),
-            details: "some details text"
+            startTime: el.start,
+            endTime: el.end,
+            details: el.details
         }
     });
-    /*[
-     {
-     task: "conceptualize",
-     type: "development",
-     startTime: "2013-1-28", //year/month/day
-     endTime: "2013-2-1",
-     details: "This actually didn't take any conceptualization"
-     },
-     ]; */
+
     var dateFormatText = "%L",
         dateFormat = d3.time.format(dateFormatText),
         startEndValsArr = serverResp.reduce((res, el) => { return res.push(el.start), res.push(el.end), res },[]),
         xAxisTicks = Math.max(...startEndValsArr);
 
-    var timeScale = d3.time.scale()
-        .domain([d3.min(taskArray, function(d) {return dateFormat.parse(d.startTime);}),
-            d3.max(taskArray, function(d) {return dateFormat.parse(d.endTime);})])
+    var chartScale = d3.scale.linear()
+        .domain([
+            d3.min(taskArray, d => +d.startTime),
+            d3.max(taskArray, d => +d.endTime)
+        ])
         .range([0,w-150]);
 
 
     var catsUnfiltered = taskArray.map(el => el.type), //for vert labels
-        categories = checkUnique(catsUnfiltered);
+        categories = checkUnique(catsUnfiltered),
+        tasksUnfiltered = taskArray.map(el => el.task), //for vert labels
+        tasks = checkUnique(tasksUnfiltered);
 
 
     makeGant(taskArray, w, h);
 
     var title = svg.append("text")
-        .text("Діаграма послідовності обробки деталей")
+        .text(chartTitle)
         .attr("x", w/2)
         .attr("y", 25)
         .attr("text-anchor", "middle")
@@ -144,14 +148,13 @@
 
 
     function makeGant(tasks, pageWidth, pageHeight) {
-
         var barHeight = 20;
         var gap = barHeight + 4;
         var topPadding = 75;
         var sidePadding = 75;
 
         var colorScale = d3.scale.linear()
-            .domain([0, categories.length])
+            .domain([0, tasks.length])
             .range(["#00B9FA", "#F95002"])
             .interpolate(d3.interpolateHcl);
 
@@ -161,7 +164,6 @@
     }
 
     function drawRects(theArray, theGap, theTopPad, theSidePad, theBarHeight, theColorScale, w, h) {
-
         var bigRects = svg.append("g")
             .selectAll("rect")
             .data(theArray)
@@ -175,52 +177,41 @@
                 return w-theSidePad/2;
             })
             .attr("height", theGap)
-            .attr("stroke", "none")
-            .attr("fill", function(d){
-                for (var i = 0; i < categories.length; i++){
-                    if (d.type == categories[i]){
-                        return d3.rgb(theColorScale(i));
-                    }
-                }
-            })
-            .attr("opacity", 0.2);
-
+            .attr("class", "gantt-chart-row");
 
         var rectangles = svg.append('g')
             .selectAll("rect")
             .data(theArray)
             .enter();
 
-
         var innerRects = rectangles.append("rect")
             .attr("rx", 3)
             .attr("ry", 3)
             .attr("x", function(d){
-                return timeScale(dateFormat.parse(d.startTime)) + theSidePad;
+                return chartScale(d.startTime) + theSidePad;
             })
             .attr("y", function(d, i){
                 return i*theGap + theTopPad;
             })
             .attr("width", function(d){
-                return (timeScale(dateFormat.parse(d.endTime))-timeScale(dateFormat.parse(d.startTime)));
+                return (chartScale(d.endTime)-chartScale(d.startTime));
             })
             .attr("height", theBarHeight)
-            .attr("stroke", "none")
             .attr("fill", function(d){
-                for (var i = 0; i < categories.length; i++){
-                    if (d.type == categories[i]){
+                for (var i = 0; i < tasks.length; i++){
+                    if (d.task == tasks[i]){
                         return d3.rgb(theColorScale(i));
                     }
                 }
             })
-
+            .attr("class", "gantt-chart-stripe");
 
         var rectText = rectangles.append("text")
             .text(function(d){
                 return d.task;
             })
             .attr("x", function(d){
-                return (timeScale(dateFormat.parse(d.endTime))-timeScale(dateFormat.parse(d.startTime)))/2 + timeScale(dateFormat.parse(d.startTime)) + theSidePad;
+                return (chartScale(d.endTime)-chartScale(d.startTime))/2 + chartScale(d.startTime) + theSidePad;
             })
             .attr("y", function(d, i){
                 return i*theGap + 14+ theTopPad;
@@ -228,84 +219,68 @@
             .attr("font-size", 11)
             .attr("text-anchor", "middle")
             .attr("text-height", theBarHeight)
-            .attr("fill", "#fff");
+            .attr("class", "gantt-chart-stripe-label");
+
+        var tooltipHtmlStr = function(data, x, y) {
+            console.log(x,y);
+            var detailsField;
+            if(data.details != undefined)
+                detailsField = `
+                    <span class="gantt-chart-tooltip__title-field">
+                        ${tooltipFieldsNames.details || 'Details'}:
+                    <\/span>  
+                    ${data.task} <br/> `;
+            else
+                detailsField = "";
+            return `<div class="gantt-chart-tooltip" style="top: ${y}; left:${x}">
+                        <span class="gantt-chart-tooltip__title-field">${tooltipFieldsNames.task || 'Task'}:<\/span>  
+                        ${data.task} <br/> 
+                        <span class="gantt-chart-tooltip__title-field">${tooltipFieldsNames.type || 'Type'       }:<\/span>  
+                        ${data.type} <br/>
+                        <span class="gantt-chart-tooltip__title-field">${tooltipFieldsNames.startTime || 'Starts'}:<\/span>  
+                        ${data.startTime} <br/>
+                        <span class="gantt-chart-tooltip__title-field">${tooltipFieldsNames.endTime || 'Ends'    }:<\/span>  
+                        ${data.endTime}
+                        <span class="gantt-chart-tooltip__title-field">
+                        ${detailsField}
+                    <\/div>`;
+        };
 
 
-        rectText.on('mouseover', function(e) {
-            // console.log(this.x.animVal.getItem(this));
-            var tag = "";
+        rectText
+            .on('mouseover', function(e) {
+                var x = this.x.animVal.getItem(this).value + "px";
+                var y = this.y.animVal.getItem(this).value + 25 + "px";
 
-            if (d3.select(this).data()[0].details != undefined){
-                tag = "Task: " + d3.select(this).data()[0].task + "<br/>" +
-                    "Type: " + d3.select(this).data()[0].type + "<br/>" +
-                    "Starts: " + d3.select(this).data()[0].startTime + "<br/>" +
-                    "Ends: " + d3.select(this).data()[0].endTime + "<br/>" +
-                    "Details: " + d3.select(this).data()[0].details;
-            } else {
-                tag = "Task: " + d3.select(this).data()[0].task + "<br/>" +
-                    "Type: " + d3.select(this).data()[0].type + "<br/>" +
-                    "Starts: " + d3.select(this).data()[0].startTime + "<br/>" +
-                    "Ends: " + d3.select(this).data()[0].endTime;
-            }
-            var output = document.getElementById("tag");
-
-            var x = this.x.animVal.getItem(this) + "px";
-            var y = this.y.animVal.getItem(this) + 25 + "px";
-
-            output.innerHTML = tag;
-            output.style.top = y;
-            output.style.left = x;
-            output.style.display = "block";
-        }).on('mouseout', function() {
-            var output = document.getElementById("tag");
-            output.style.display = "none";
-        });
-
+                document.querySelector(chartContainer)
+                    .insertAdjacentHTML("beforeEnd", tooltipHtmlStr(d3.select(this).data()[0], x, y));
+            })
+            .on('mouseout', function (e) {
+                var tooltips = document.getElementsByClassName("gantt-chart-tooltip");
+                Array.from(tooltips)
+                    .forEach(el => el.remove(el));
+            });
 
         innerRects.on('mouseover', function(e) {
-            //console.log(this);
-            var tag = "";
-
-            if (d3.select(this).data()[0].details != undefined){
-                tag = "Task: " + d3.select(this).data()[0].task + "<br/>" +
-                    "Type: " + d3.select(this).data()[0].type + "<br/>" +
-                    "Starts: " + d3.select(this).data()[0].startTime + "<br/>" +
-                    "Ends: " + d3.select(this).data()[0].endTime + "<br/>" +
-                    "Details: " + d3.select(this).data()[0].details;
-            } else {
-                tag = "Task: " + d3.select(this).data()[0].task + "<br/>" +
-                    "Type: " + d3.select(this).data()[0].type + "<br/>" +
-                    "Starts: " + d3.select(this).data()[0].startTime + "<br/>" +
-                    "Ends: " + d3.select(this).data()[0].endTime;
-            }
-            var output = document.getElementById("tag");
-
             var x = (this.x.animVal.value + this.width.animVal.value/2) + "px";
             var y = this.y.animVal.value + 25 + "px";
 
-            output.innerHTML = tag;
-            output.style.top = y;
-            output.style.left = x;
-            output.style.display = "block";
+            document.querySelector(chartContainer)
+                .insertAdjacentHTML("beforeEnd", tooltipHtmlStr(d3.select(this).data()[0], x, y));
         }).on('mouseout', function() {
-            var output = document.getElementById("tag");
-            output.style.display = "none";
-
+            var tooltips = document.getElementsByClassName("gantt-chart-tooltip");
+            Array.from(tooltips)
+                .forEach(el => el.remove(el));
         });
-
-
-
     }
 
     function makeGrid(theSidePad, theTopPad, w, h) {
-
         var xAxis = d3.svg.axis()
-            .scale(timeScale)
+            .scale(chartScale)
             .orient('bottom')
             .ticks( xAxisTicks )
             .tickSize(-h+theTopPad+20, 0, 0)
-            .tickFormat(function(d) { return d.getMilliseconds() });
-            //.tickFormat(d3.format(",.0f"));
+            .tickFormat(d => d);
 
         var grid = svg.append('g')
             .attr('class', 'grid')
@@ -350,6 +325,7 @@
             .attr("font-size", 11)
             .attr("text-anchor", "start")
             .attr("text-height", 14)
+            .attr("class", "gantt-chart-row-label")
             .attr("fill", function(d){
                 for (var i = 0; i < categories.length; i++){
                     if (d[0] == categories[i]){
@@ -358,7 +334,6 @@
                     }
                 }
             });
-
     }
 
 //from this stackexchange question: http://stackoverflow.com/questions/1890203/unique-for-arrays-in-javascript

@@ -1,21 +1,8 @@
-
-* {
-    margin: 0;
-    padding: 0;
-}
-body {
-    background: #fff;
-    font-family: 'Open-Sans',sans-serif;
-
-}
-
-#container{
-    margin: 0 auto;
+.gantt-chart-container {
     position: relative;
-    width:800px;
-    overflow: visible;
+    width: 900px;
+    height: 500px;
 }
-
 
 .svg {
     width:800px;
@@ -34,20 +21,38 @@ body {
 }
 
 
-#tag {
+.gantt-chart-stripe {
+
+}
+
+.gantt-chart-stripe-label {
+    font-style: italic;
+}
+
+.gantt-chart-row-label {
+    font-size: 1em;
+    font-weight: bold;
+}
+
+.gantt-chart-row {
+    fill: white;
+    opacity: 0.1;
+}
+
+
+.gantt-chart-tooltip {
     color: white;
-    background: #FA283D;
+  /*  background: #FA283D;  */
+    background: #2c3e50;
     width: 150px;
     position: absolute;
-    display: none;
+  /*  display: none;    */
     padding:3px 6px;
     margin-left: -80px;
     font-size: 11px;
 }
 
-
-
-#tag:before {
+.gantt-chart-tooltip:before {
     border: solid transparent;
     content: ' ';
     height: 0;
@@ -56,6 +61,13 @@ body {
     position: absolute;
     width: 0;
     border-width: 10px;
-    border-bottom-color: #FA283D;
+    border-bottom-color: #2c3e50 /*#FA283D*/;
     top: -20px;
+}
+
+.gantt-chart-tooltip__title-field {
+    width: 5em;
+    display: inline-block;
+    /* text-align: right; */
+    margin-right: 5px;
 }

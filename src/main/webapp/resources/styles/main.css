@@ -57,9 +57,6 @@ header {
 
     .results-block {
         margin-bottom: 15px;
-        position: relative;
-        width: 900px;
-        height: 500px;
     }
 /*
         .res-matrix {
