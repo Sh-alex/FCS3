@@ -20,6 +20,22 @@
 }
 
 
+
+.axis path, .axis line {
+    fill: none;
+    stroke: steelblue;
+}
+
+.axis text {
+    font: 10px Verdana;
+}
+
+
+
+
+
+
+
 .gantt-chart-stripe {
 
 }
@@ -37,16 +53,17 @@
     font-size: 1em;
     font-weight: bold;
     font-family: cursive;
+    dominant-baseline: hanging;
     dominant-baseline: text-before-edge;
     fill: #484848;
 }
 
 .gantt-chart-row {
-    fill: red;
+    fill: white;
     opacity: 0.1;
 }
 .gantt-chart-row:nth-child(odd) {
-    fill: blue;
+    fill: black;
     opacity: 0.1;
 }
 
@@ -82,3 +99,21 @@
     /* text-align: right; */
     margin-right: 5px;
 }
+
+
+.legend {
+
+}
+
+    .legend-row {
+
+    }
+
+        .legend-square {
+
+        }
+
+        .legend-text {
+            font-style: italic;
+            fill: #484848;
+        }

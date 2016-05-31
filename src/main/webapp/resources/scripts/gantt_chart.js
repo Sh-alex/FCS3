@@ -1,5 +1,5 @@
 (function(){
-    var w = 800;
+    var w = 1000;
     var barHeight = 20;
     var serverResp = [
         {
@@ -87,7 +87,7 @@
 
 
 
-    var taskArray = serverResp.map(el => {
+    var taskArray = serverResp.map(el => {                  //Трансформований масив задач
         return {
             task: "Деталь " + el.detail,
             type: "ГВМ "+ el.gvm,
@@ -95,38 +95,41 @@
             endTime: el.end,
             details: el.details
         }
-    });	
+    });
 
-    var startEndValsArr = serverResp.reduce((res, el) => { return res.push(el.start), res.push(el.end), res },[]),
-        xAxisTicks = Math.max(...startEndValsArr);
+    var catsUnfiltered = taskArray.map(el => el.type),
+        categories = checkUnique(catsUnfiltered).sort(),    //масив імен катеогорій(рядків)
+        tasksUnfiltered = taskArray.map(el => el.task),
+        taskNames = checkUnique(tasksUnfiltered).sort();        //масив імен усіх задач
 
-    var chartScale = d3.scale.linear()
-        .domain([
-            d3.min(taskArray, d => d.startTime),
-            d3.max(taskArray, d => d.endTime)
-        ])
-        .range([0, w-150]);
+    var taskStripeVertOffset = 2,                           //відступ полоски із задачею від верхньої/нижньої меж рядка
+        gap = barHeight + taskStripeVertOffset*2,           //висота 1 рядка на діаграмі
+        leftSidePadding = 100,                              //відступ збоку для підписів осі OY
+        rightSidePadding = 100,                             //відступ справа для легенди
+        xAxisLablesH = 20,		                            //висота підписів вісі ОХ
+        legendRowH = 20,                                    //висота рядка у легенді
+        categoriesRowsH = categories.length*gap + xAxisLablesH,
+        legendRowsH = legendRowH*taskNames.length,
+        h = Math.max(categoriesRowsH, legendRowsH),         //висота діаграми
+        OXStep = 20;                                        //крок із позначками по вісі ОХ
 
-    var catsUnfiltered = taskArray.map(el => el.type), //for vert labels
-        categories = checkUnique(catsUnfiltered),
-        tasksUnfiltered = taskArray.map(el => el.task), //for vert labels
-        tasks = checkUnique(tasksUnfiltered);
+    var maxTaskTime = d3.max(taskArray, d => d.endTime),
+        chartScale = d3.scale.linear()      //масштабування із діапазону [Min ; Max]знач масиву у ширину графіка
+            .domain([0, maxTaskTime])
+            .range([0, w - rightSidePadding - leftSidePadding]);
 
-    var colorScale = d3.scale.linear()
-        .domain([0, tasks.length])
+    var xAxisTicks = Math.floor(chartScale(maxTaskTime)/OXStep); //кількість позначок по вісі ОХ
+
+    var colorScale = d3.scale.linear()                      //діапазон кольорів для задач
+        .domain([0, taskNames.length])
         .range(["#00B9FA", "#F95002"])
         .interpolate(d3.interpolateHcl);
 
-
-        var gap = barHeight + 4;
-        var sidePadding = 75;
-        var xAxisLablesH = 20;		//висота підписів вісі ОХ
-
-        var h = categories.length*gap + xAxisLablesH;
-
-
     var svg = d3.selectAll(chartContainer)
-        .append("svg");
+        .append("svg")
+        .attr("width", w)
+        .attr("height", h)
+        .attr("class", "svg");
 
 
 
@@ -134,76 +137,56 @@
 
     makeGant(taskArray, w, h);
 
-    function makeGant(tasks, pageWidth, pageHeight) {
-
-    svg.attr("width", w)
-        .attr("height", h)
-        .attr("class", "svg");
-
-        makeGrid(sidePadding, pageWidth, pageHeight);
-        drawRects(tasks, gap, sidePadding, barHeight, colorScale, pageWidth, pageHeight);
-        rowLabels(gap, sidePadding, barHeight);
+    function makeGant(taskArray, pageWidth, pageHeight) {
+        makeGrid(leftSidePadding, pageWidth, pageHeight);
+        drawRects(taskArray, gap, leftSidePadding, barHeight, colorScale, pageWidth, pageHeight);
+        rowLabels(gap, leftSidePadding, barHeight);
+        drawLegend(taskNames, w, legendRowH, colorScale);
     }
 
-    function drawRects(theArray, theGap, theSidePad, theBarHeight, theColorScale, w, h) {
+    function drawRects(theArray, theGap, leftSidePadding, theBarHeight, theColorScale, w, h) {
         var bigRects = svg.append("g")
             .selectAll("rect")
-            .data(new Array(categories.length))
+            .data(categories)
             .enter()
             .append("rect")
             .attr("x", 0)
             .attr("y", function(d, i){
-                return i*theGap - 2;
+                return i*theGap;
             })
-            .attr("width", function(d){
-                return w-theSidePad/2;
+            .attr("width", function(d) {
+                return w - rightSidePadding;
             })
             .attr("height", theGap)
             .attr("class", "gantt-chart-row");
 
-        var rectangles = svg.append('g')
+        var innerRects = svg.append('g')
             .selectAll("rect")
             .data(theArray)
-            .enter();
-
-        var rowCounter = 0;
-        var innerRects = rectangles.append("rect")
+            .enter()
+            .append("rect")
             .attr("rx", 3)
             .attr("ry", 3)
             .attr("x", function(d){
-                return chartScale(d.startTime) + theSidePad;
+                return chartScale(d.startTime) + leftSidePadding;
             })
             .attr("y", function(d, i) {
-                return Math.floor((i/taskArray.length)*categories.length)*theGap;
+                var categoryIndex = categories.findIndex(cat => cat === d.type);
+                return categoryIndex*theGap + taskStripeVertOffset;
             })
             .attr("width", function(d){
                 return (chartScale(d.endTime)-chartScale(d.startTime));
             })
             .attr("height", theBarHeight)
             .attr("fill", function(d){
-                for (var i = 0; i < tasks.length; i++){
-                    if (d.task == tasks[i]){
+                for (var i = 0; i < taskNames.length; i++){
+                    if (d.task == taskNames[i]){
                         return d3.rgb(theColorScale(i));
                     }
                 }
             })
             .attr("class", "gantt-chart-stripe");
-/*
-        var rectText = rectangles.append("text")
-            .text(function(d){
-                return d.task;
-            })
-            .attr("x", function(d){
-                return (chartScale(d.endTime)-chartScale(d.startTime))/2 + chartScale(d.startTime) + theSidePad;
-            })
-            .attr("y", function(d, i){
-                return Math.floor((i/taskArray.length)*categories.length)*theGap + 14;
-            })
-            .attr("font-size", 11)
-            .attr("text-anchor", "middle")
-            .attr("text-height", theBarHeight)
-            .attr("class", "gantt-chart-stripe-label");
-*/
+
         var tooltipHtmlStr = function(data, x, y) {
             var detailsField;
             if(data.details != undefined)
@@ -228,21 +211,6 @@
                     <\/div>`;
         };
 
-/*
-        rectText
-            .on('mouseover', function(e) {
-                var x = this.x.animVal.getItem(this).value + "px";
-                var y = this.y.animVal.getItem(this).value + 25 + "px";
-
-                document.querySelector(chartContainer)
-                    .insertAdjacentHTML("beforeEnd", tooltipHtmlStr(d3.select(this).data()[0], x, y));
-            })
-            .on('mouseout', function (e) {
-                var tooltips = document.getElementsByClassName("gantt-chart-tooltip");
-                Array.from(tooltips)
-                    .forEach(el => el.remove(el));
-            });
-*/
         innerRects.on('mouseover', function(e) {
             var x = (this.x.animVal.value + this.width.animVal.value/2) + "px";
             var y = this.y.animVal.value + 25 + "px";
@@ -256,7 +224,7 @@
         });
     }
 
-    function makeGrid(theSidePad, w, h) {
+    function makeGrid(leftSidePadding, w, h) {
         var xAxis = d3.svg.axis()
             .scale(chartScale)
             .orient('bottom')
@@ -266,7 +234,7 @@
 
         var grid = svg.append('g')
             .attr('class', 'grid')
-            .attr('transform', `translate(${theSidePad} , ${0})`)
+            .attr('transform', `translate(${leftSidePadding} , ${0})`)
             .call(xAxis)
             .selectAll("text")
             .style("text-anchor", "middle")
@@ -276,7 +244,7 @@
             .attr("dy", "1em");
     }
 
-    function rowLabels(theGap, theSidePad, theBarHeight, rowLabelsColor="black") {
+    function rowLabels(theGap, leftSidePadding, theBarHeight, rowLabelsColor="black") {
         var axisText = svg.append("g") //without doing this, impossible to put grid lines behind text
             .selectAll("text")
             .data(categories)
@@ -291,7 +259,36 @@
             .attr("text-anchor", "start")
             .attr("text-height", 14)
             .attr("class", "gantt-chart-row-label")
-         //   .attr("fill", rowLabelsColor);
+        //   .attr("fill", rowLabelsColor);
+    }
+
+    function drawLegend(taskNames, chartW, legendRowH, theColorScale) {
+        var legendTable = svg.append("g")
+            .attr("class", "legend-table");
+
+        var legend = legendTable.selectAll(".legend-row")
+            .data(taskNames)
+            .enter().append("g")
+            .attr("class", "legend-row")
+            .attr("transform", function(d, i) {
+                return "translate(0, " + i * legendRowH + ")";
+            });
+
+        legend.append("rect")
+            .attr("x", chartW - 10)
+            .attr("y", 4)
+            .attr("width", 10)
+            .attr("height", 10)
+            .attr("class", "legend-square")
+            .style("fill", (d, i) => d3.rgb(theColorScale(i)) );
+
+        legend.append("text")
+            .attr("x", chartW - 14)
+            .attr("y", 9)
+            .attr("dy", ".35em")
+            .style("text-anchor", "end")
+            .attr("class", "legend-text")
+            .text(d => d);
     }
 
 //from this stackexchange question: http://stackoverflow.com/questions/1890203/unique-for-arrays-in-javascript
