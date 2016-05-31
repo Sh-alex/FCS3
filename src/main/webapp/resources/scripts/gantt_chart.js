@@ -1,7 +1,6 @@
 (function(){
     var w = 800;
-    var h = 400;
-    var chartTitle = "Діаграма послідовності обробки деталей";
+    var barHeight = 20;
     var serverResp = [
         {
             "gvm": 1,
@@ -86,25 +85,7 @@
     };
 
 
-    var svg = d3.selectAll(chartContainer)
-        .append("svg")
-        .attr("width", w)
-        .attr("height", h)
-        .attr("class", "svg");
 
-    function msNumToString(num) {
-        if(num > 999){
-            var errorMsg = "Too big number gotten as start / finish: " + num;
-            alert(errorMsg);
-            throw new Error(errorMsg);
-        }
-        if(num > 99)
-            return num.toString();
-        else if( num > 9)
-            return "0" + num;
-        else
-            return "00" + num;
-    }
 
     var taskArray = serverResp.map(el => {
         return {
@@ -114,64 +95,65 @@
             endTime: el.end,
             details: el.details
         }
-    });
+    });	
 
-    var dateFormatText = "%L",
-        dateFormat = d3.time.format(dateFormatText),
-        startEndValsArr = serverResp.reduce((res, el) => { return res.push(el.start), res.push(el.end), res },[]),
+    var startEndValsArr = serverResp.reduce((res, el) => { return res.push(el.start), res.push(el.end), res },[]),
         xAxisTicks = Math.max(...startEndValsArr);
 
     var chartScale = d3.scale.linear()
         .domain([
-            d3.min(taskArray, d => +d.startTime),
-            d3.max(taskArray, d => +d.endTime)
+            d3.min(taskArray, d => d.startTime),
+            d3.max(taskArray, d => d.endTime)
         ])
-        .range([0,w-150]);
-
+        .range([0, w-150]);
 
     var catsUnfiltered = taskArray.map(el => el.type), //for vert labels
         categories = checkUnique(catsUnfiltered),
         tasksUnfiltered = taskArray.map(el => el.task), //for vert labels
         tasks = checkUnique(tasksUnfiltered);
 
+    var colorScale = d3.scale.linear()
+        .domain([0, tasks.length])
+        .range(["#00B9FA", "#F95002"])
+        .interpolate(d3.interpolateHcl);
+
+
+        var gap = barHeight + 4;
+        var sidePadding = 75;
+        var xAxisLablesH = 20;		//висота підписів вісі ОХ
+
+        var h = categories.length*gap + xAxisLablesH;
+
+
+    var svg = d3.selectAll(chartContainer)
+        .append("svg");
+
+
+
+
 
     makeGant(taskArray, w, h);
 
-    var title = svg.append("text")
-        .text(chartTitle)
-        .attr("x", w/2)
-        .attr("y", 25)
-        .attr("text-anchor", "middle")
-        .attr("font-size", 18)
-        .attr("fill", "#009FFC");
-
-
-
     function makeGant(tasks, pageWidth, pageHeight) {
-        var barHeight = 20;
-        var gap = barHeight + 4;
-        var topPadding = 75;
-        var sidePadding = 75;
 
-        var colorScale = d3.scale.linear()
-            .domain([0, tasks.length])
-            .range(["#00B9FA", "#F95002"])
-            .interpolate(d3.interpolateHcl);
+    svg.attr("width", w)
+        .attr("height", h)
+        .attr("class", "svg");
 
-        makeGrid(sidePadding, topPadding, pageWidth, pageHeight);
-        drawRects(tasks, gap, topPadding, sidePadding, barHeight, colorScale, pageWidth, pageHeight);
-        vertLabels(gap, topPadding, sidePadding, barHeight, colorScale);
+        makeGrid(sidePadding, pageWidth, pageHeight);
+        drawRects(tasks, gap, sidePadding, barHeight, colorScale, pageWidth, pageHeight);
+        rowLabels(gap, sidePadding, barHeight);
     }
 
-    function drawRects(theArray, theGap, theTopPad, theSidePad, theBarHeight, theColorScale, w, h) {
+    function drawRects(theArray, theGap, theSidePad, theBarHeight, theColorScale, w, h) {
         var bigRects = svg.append("g")
             .selectAll("rect")
-            .data(theArray)
+            .data(new Array(categories.length))
             .enter()
             .append("rect")
             .attr("x", 0)
             .attr("y", function(d, i){
-                return i*theGap + theTopPad - 2;
+                return i*theGap - 2;
             })
             .attr("width", function(d){
                 return w-theSidePad/2;
@@ -184,14 +166,15 @@
             .data(theArray)
             .enter();
 
+        var rowCounter = 0;
         var innerRects = rectangles.append("rect")
             .attr("rx", 3)
             .attr("ry", 3)
             .attr("x", function(d){
                 return chartScale(d.startTime) + theSidePad;
             })
-            .attr("y", function(d, i){
-                return i*theGap + theTopPad;
+            .attr("y", function(d, i) {
+                return Math.floor((i/taskArray.length)*categories.length)*theGap;
             })
             .attr("width", function(d){
                 return (chartScale(d.endTime)-chartScale(d.startTime));
@@ -205,7 +188,7 @@
                 }
             })
             .attr("class", "gantt-chart-stripe");
-
+/*
         var rectText = rectangles.append("text")
             .text(function(d){
                 return d.task;
@@ -214,15 +197,14 @@
                 return (chartScale(d.endTime)-chartScale(d.startTime))/2 + chartScale(d.startTime) + theSidePad;
             })
             .attr("y", function(d, i){
-                return i*theGap + 14+ theTopPad;
+                return Math.floor((i/taskArray.length)*categories.length)*theGap + 14;
             })
             .attr("font-size", 11)
             .attr("text-anchor", "middle")
             .attr("text-height", theBarHeight)
             .attr("class", "gantt-chart-stripe-label");
-
+*/
         var tooltipHtmlStr = function(data, x, y) {
-            console.log(x,y);
             var detailsField;
             if(data.details != undefined)
                 detailsField = `
@@ -246,7 +228,7 @@
                     <\/div>`;
         };
 
-
+/*
         rectText
             .on('mouseover', function(e) {
                 var x = this.x.animVal.getItem(this).value + "px";
@@ -260,7 +242,7 @@
                 Array.from(tooltips)
                     .forEach(el => el.remove(el));
             });
-
+*/
         innerRects.on('mouseover', function(e) {
             var x = (this.x.animVal.value + this.width.animVal.value/2) + "px";
             var y = this.y.animVal.value + 25 + "px";
@@ -274,17 +256,17 @@
         });
     }
 
-    function makeGrid(theSidePad, theTopPad, w, h) {
+    function makeGrid(theSidePad, w, h) {
         var xAxis = d3.svg.axis()
             .scale(chartScale)
             .orient('bottom')
             .ticks( xAxisTicks )
-            .tickSize(-h+theTopPad+20, 0, 0)
+            .tickSize(h - xAxisLablesH, 0, 0)	//висота ліній - висота усієї діаграми - висота підписвів вісі ОХ
             .tickFormat(d => d);
 
         var grid = svg.append('g')
             .attr('class', 'grid')
-            .attr('transform', 'translate(' +theSidePad + ', ' + (h - 50) + ')')
+            .attr('transform', `translate(${theSidePad} , ${0})`)
             .call(xAxis)
             .selectAll("text")
             .style("text-anchor", "middle")
@@ -294,46 +276,22 @@
             .attr("dy", "1em");
     }
 
-    function vertLabels(theGap, theTopPad, theSidePad, theBarHeight, theColorScale) {
-        var numOccurances = [];
-        var prevGap = 0;
-
-        for (var i = 0; i < categories.length; i++){
-            numOccurances[i] = [categories[i], getCount(categories[i], catsUnfiltered)];
-        }
-
+    function rowLabels(theGap, theSidePad, theBarHeight, rowLabelsColor="black") {
         var axisText = svg.append("g") //without doing this, impossible to put grid lines behind text
             .selectAll("text")
-            .data(numOccurances)
+            .data(categories)
             .enter()
             .append("text")
-            .text(function(d){
-                return d[0];
-            })
+            .text(d => d)
             .attr("x", 10)
             .attr("y", function(d, i){
-                if (i > 0){
-                    for(var j = 0; j < i; j++){
-                        prevGap += numOccurances[i-1][1];
-                        // console.log(prevGap);
-                        return d[1]*theGap/2 + prevGap*theGap + theTopPad;
-                    }
-                } else{
-                    return d[1]*theGap/2 + theTopPad;
-                }
+                return i*theGap;
             })
             .attr("font-size", 11)
             .attr("text-anchor", "start")
             .attr("text-height", 14)
             .attr("class", "gantt-chart-row-label")
-            .attr("fill", function(d){
-                for (var i = 0; i < categories.length; i++){
-                    if (d[0] == categories[i]){
-                        //  console.log("true!");
-                        return d3.rgb(theColorScale(i)).darker();
-                    }
-                }
-            });
+         //   .attr("fill", rowLabelsColor);
     }
 
 //from this stackexchange question: http://stackoverflow.com/questions/1890203/unique-for-arrays-in-javascript

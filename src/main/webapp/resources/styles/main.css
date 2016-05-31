@@ -58,6 +58,11 @@ header {
     .results-block {
         margin-bottom: 15px;
     }
+
+        .gantt-chrt-heading {
+            text-align: center;
+            color: rgb(0, 159, 252);            
+        }
 /*
         .res-matrix {
 

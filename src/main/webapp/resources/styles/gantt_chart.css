@@ -5,8 +5,6 @@
 }
 
 .svg {
-    width:800px;
-    height:400px;
     overflow: visible;
     position:absolute;
 }
@@ -16,6 +14,7 @@
     opacity: 0.3;
     shape-rendering: crispEdges;
 }
+
 .grid path {
     stroke-width: 0;
 }
@@ -24,18 +23,30 @@
 .gantt-chart-stripe {
 
 }
-
+/*
 .gantt-chart-stripe-label {
     font-style: italic;
+    display: none;
 }
+.gantt-chart-stripe-label:hover {
+	display: block;
+}
+*/
 
 .gantt-chart-row-label {
     font-size: 1em;
     font-weight: bold;
+    font-family: cursive;
+    dominant-baseline: text-before-edge;
+    fill: #484848;
 }
 
 .gantt-chart-row {
-    fill: white;
+    fill: red;
+    opacity: 0.1;
+}
+.gantt-chart-row:nth-child(odd) {
+    fill: blue;
     opacity: 0.1;
 }
 
