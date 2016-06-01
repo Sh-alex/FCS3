@@ -157,6 +157,44 @@ public class GanttBuilder {
 
     }
 
+    public void maxResidualLabor() {
+        boolean techRoutesIsEmpty = false;
+
+        while (!techRoutesIsEmpty) {
+            List<List<Integer>> candidatesOnGvm = searchCandidatesOnGvm();
+
+            for (int i = 0; i < candidatesOnGvm.size(); i++) {
+                for (int j = candidatesOnGvm.get(i).size() - 1; j >= 0; j--) {
+                    for (int k = 0; k < j; k++) {
+                        if (timeOperations.get(candidatesOnGvm.get(i).get(k)).stream().mapToDouble(Double::doubleValue).sum() <
+                                timeOperations.get(candidatesOnGvm.get(i).get(k + 1)).stream().mapToDouble(Double::doubleValue).sum()) {
+                            int temp = candidatesOnGvm.get(i).get(k);
+                            candidatesOnGvm.get(i).set(k, candidatesOnGvm.get(i).get(k + 1));
+                            candidatesOnGvm.get(i).set(k + 1, temp);
+                        }
+                    }
+                }
+            }
+
+            for (int i = 0; i < candidatesOnGvm.size(); i++) {
+                candidatesOnGvm.get(i).subList(1, candidatesOnGvm.get(i).size()).clear();
+            }
+
+            saveElement(candidatesOnGvm);
+
+            for (List<Integer> list : techRoutes) {
+                if (list.isEmpty()) {
+                    techRoutesIsEmpty = true;
+                } else {
+                    techRoutesIsEmpty = false;
+                    break;
+                }
+            }
+
+
+        }
+    }
+
     private void saveElement(List<List<Integer>> candidatesOnGvm) {
 
         for (int i = 0; i < candidatesOnGvm.size(); i++) {

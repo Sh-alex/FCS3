@@ -7,6 +7,8 @@ import java.util.Arrays;
 import java.util.List;
 
 public class GanttBuilderTest {
+
+
     List<List<Integer>> techRoutes = new ArrayList<>(new ArrayList<>(Arrays.asList(new ArrayList<Integer>(Arrays.asList(2, 3, 1)), new ArrayList<Integer>(Arrays.asList(2, 1, 3)),
             new ArrayList<Integer>(Arrays.asList(3, 1, 2)), new ArrayList<Integer>(Arrays.asList(3, 2, 1)))));
 
@@ -22,6 +24,14 @@ public class GanttBuilderTest {
 
 
         ganttBuilder.shortestOperation();
+
+    }
+
+    @Test
+    public void maxResidualLabor() throws Exception {
+        GanttBuilder ganttBuilder = new GanttBuilder(3, 4, techRoutes, timeOperations);
+
+        ganttBuilder.maxResidualLabor();
 
     }
 
