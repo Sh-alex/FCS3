@@ -1,0 +1,119 @@
+.gantt-chart-container {
+    position: relative;
+    width: 900px;
+    height: 500px;
+}
+
+.svg {
+    overflow: visible;
+    position:absolute;
+}
+
+.grid .tick {
+    stroke: lightgrey;
+    opacity: 0.3;
+    shape-rendering: crispEdges;
+}
+
+.grid path {
+    stroke-width: 0;
+}
+
+
+
+.axis path, .axis line {
+    fill: none;
+    stroke: steelblue;
+}
+
+.axis text {
+    font: 10px Verdana;
+}
+
+
+
+
+
+
+
+.gantt-chart-stripe {
+
+}
+/*
+.gantt-chart-stripe-label {
+    font-style: italic;
+    display: none;
+}
+.gantt-chart-stripe-label:hover {
+	display: block;
+}
+*/
+
+.gantt-chart-row-label {
+    font-size: 1em;
+    font-weight: bold;
+    font-family: cursive;
+    dominant-baseline: hanging;
+    dominant-baseline: text-before-edge;
+    fill: #484848;
+}
+
+.gantt-chart-row {
+    fill: white;
+    opacity: 0.1;
+}
+.gantt-chart-row:nth-child(odd) {
+    fill: black;
+    opacity: 0.1;
+}
+
+
+.gantt-chart-tooltip {
+    color: white;
+  /*  background: #FA283D;  */
+    background: #2c3e50;
+    width: 150px;
+    position: absolute;
+  /*  display: none;    */
+    padding:3px 6px;
+    margin-left: -80px;
+    font-size: 11px;
+}
+
+.gantt-chart-tooltip:before {
+    border: solid transparent;
+    content: ' ';
+    height: 0;
+    left: 50%;
+    margin-left: -5px;
+    position: absolute;
+    width: 0;
+    border-width: 10px;
+    border-bottom-color: #2c3e50 /*#FA283D*/;
+    top: -20px;
+}
+
+.gantt-chart-tooltip__title-field {
+    width: 5em;
+    display: inline-block;
+    /* text-align: right; */
+    margin-right: 5px;
+}
+
+
+.legend {
+
+}
+
+    .legend-row {
+
+    }
+
+        .legend-square {
+
+        }
+
+        .legend-text {
+            font-style: italic;
+            fill: #484848;
+        }

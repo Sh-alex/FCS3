@@ -1,0 +1,166 @@
+/*Загальні стилі для всієї сторінки*/
+
+@font-face {
+    font-family: comic;
+    src: url("../fonts/comic.ttf");
+}
+/*
+body {
+  font-family: 'Merriweather',serif;
+  font-size: 16px;
+}
+.btn, .navbar, select, select.form-control {
+  border-radius: 0
+}
+*/
+
+
+
+
+header {
+    /*
+      background-color: #455a64;
+    */
+
+}
+
+    .header__heading{
+        color: #13daec;
+        font-family: comic, cursive;
+        font-weight: 300;
+        text-shadow: 0px 1px 0px #050058;
+        letter-spacing: -2px;
+        text-transform: uppercase;
+    }
+
+
+
+
+
+.main-block {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    min-height: calc(100% - 60px);
+}
+
+    .input-column, .results-column {
+        max-width: 100%;
+        display: flex;
+        flex-grow: 1;
+        justify-content: center;
+    }
+
+    .results-block, .input-block {
+        max-width: 100%;
+    }
+
+    .results-block {
+        margin-bottom: 15px;
+    }
+
+        .gantt-chrt-heading {
+            text-align: center;
+            color: rgb(0, 159, 252);            
+        }
+/*
+        .res-matrix {
+
+        }
+
+            .res-matrix__table-wrapper{
+                padding: 2px 15px;
+            }
+
+                .res-matrix__table {
+                    margin: 0;
+                }
+
+                    .res-matrix__row {
+
+                    }
+
+                        .res-matrix th {
+                            text-align: center;
+                            padding: 8px;
+                        }
+                        .res-matrix td {
+
+                        }
+
+*/
+
+        .inp-num-of-vars {
+
+        }
+
+            .inp-num-of-vars__label {
+                width: 15em;
+            }
+
+            .inp-num-of-vars__select {
+                display: inline;
+                width: auto;
+            }
+
+
+
+        .inp-matrix {
+
+        }
+
+        .inp-matrix__table-wrapper {
+            overflow-y: hidden;
+        }
+
+            .inp-matrix__table {
+                margin: 0;
+                width: auto;
+            }
+
+                .inp-matrix__row {
+
+                }
+
+                    .inp-matrix__cell {
+                        margin: 0;
+                        vertical-align: middle !important;
+                        padding: 8px 8px 0 0 !important;
+                    }
+
+                        .inp-matrix__input {
+                            height: auto;
+                            text-align: center;
+                            padding: 1px 3px;
+                            width: 5em;
+                            border-top: none;
+                            border-left: none;
+                            border-right: none;
+                        }
+
+                        .inp-matrix__text {
+
+                        }
+
+                        .inp-matrix__select {
+                            height: auto;
+                            border: none;
+                            width: auto;
+                            cursor: pointer;
+                        }
+
+
+
+.footer {
+    margin: 0 auto;
+}
+
+    .footer .navbar {
+        margin: 0 auto;
+        border-radius: 0;
+    }
+
+        .footer__navbar-text {
+            float: none;
+        }
+
