@@ -1,210 +1,119 @@
-(function(){
-    var w = 1000;
-    var barHeight = 20;
-    var serverResp = [
-        {
-            "gvm": 1,
-            "detail": 1,
-            "start": 7,
-            "end": 9
-        },
-        {
-            "gvm": 1,
-            "detail": 2,
-            "start": 14,
-            "end": 15
-        },
-        {
-            "gvm": 1,
-            "detail": 3,
-            "start": 15,
-            "end": 17
-        },
-        {
-            "gvm": 1,
-            "detail": 4,
-            "start": 17,
-            "end": 22
-        },
-        {
-            "gvm": 2,
-            "detail": 1,
-            "start": 0,
-            "end": 2
-        },
-        {
-            "gvm": 2,
-            "detail": 4,
-            "start": 4,
-            "end": 8
-        },
-        {
-            "gvm": 2,
-            "detail": 2,
-            "start": 8,
-            "end": 14
-        },
-        {
-            "gvm": 2,
-            "detail": 3,
-            "start": 17,
-            "end": 21
-        },
-        {
-            "gvm": 3,
-            "detail": 4,
-            "start": 0,
-            "end": 4
-        },
-        {
-            "gvm": 3,
-            "detail": 1,
-            "start": 4,
-            "end": 7
-        },
-        {
-            "gvm": 3,
-            "detail": 3,
-            "start": 7,
-            "end": 13
-        },
-        {
-            "gvm": 3,
-            "detail": 2,
-            "start": 15,
-            "end": 17
-        }
-    ];
-    var chartContainer = ".gantt-chart-container";
-    var tooltipFieldsNames =  {
-        task: "Деталь",
-        type: "ГВМ",
-        startTime: "Початок",
-        endTime: "Кінець",
-        details: "Опис"
-    };
+class GanttChart {
+    constructor(options) {
+        if(!options.chartContainer)
+            throw new Error("Attempt to create new Gantt Chart without option chartContainer passed.");
+        else
+            this.chartContainer = options.chartContainer;
+        if(!options.tasksData.length)
+            throw new Error("Attempt to create new Gantt Chart, but incorrect argument taskData passed.");
+        else
+            this.taskArray = options.tasksData;
+        this.w = options.w || 800;
+        this.barHeight = options.barHeight || 20;
+        this.tooltipFieldsNames = options.tooltipFieldsNames || {
+                task: "Pflfxf",
+                type: "Категорія",
+                startTime: "Початок",
+                endTime: "Кінець",
+                details: "Опис"
+            };
 
+        this.catsUnfiltered = this.taskArray.map(el => el.type);
+        this.categories = utils.checkUnique(this.catsUnfiltered).sort();    //масив імен катеогорій(рядків)
+        this.tasksUnfiltered = this.taskArray.map(el => el.task);
+        this.taskNames = utils.checkUnique(this.tasksUnfiltered).sort();        //масив імен усіх задач
 
+        this.taskStripeVertOffset = 2;                           //відступ полоски із задачею від верхньої/нижньої меж рядка
+        this.gap = this.barHeight + this.taskStripeVertOffset*2;           //висота 1 рядка на діаграмі
+        this.leftSidePadding = 100;                              //відступ збоку для підписів осі OY
+        this.rightSidePadding = 100;                             //відступ справа для легенди
+        this.xAxisLablesH = 20;		                            //висота підписів вісі ОХ
+        this.legendRowH = 20;                                    //висота рядка у легенді
+        this.categoriesRowsH = this.categories.length*this.gap + this.xAxisLablesH;
+        this.legendRowsH = this.legendRowH*this.taskNames.length;
+        this.h = Math.max(this.categoriesRowsH, this.legendRowsH);         //висота діаграми
+        this.OXStep = 20;                                        //крок із позначками по вісі ОХ
 
+        this.maxTaskTime = d3.max(this.taskArray, d => d.endTime);
+        this.chartScale = d3.scale.linear()      //масштабування із діапазону [Min ; Max]знач масиву у ширину графіка
+            .domain([0, this.maxTaskTime])
+            .range([0, this.w - this.rightSidePadding - this.leftSidePadding]);
 
-    var taskArray = serverResp.map(el => {                  //Трансформований масив задач
-        return {
-            task: "Деталь " + el.detail,
-            type: "ГВМ "+ el.gvm,
-            startTime: el.start,
-            endTime: el.end,
-            details: el.details
-        }
-    });
+        this.xAxisTicks = Math.floor(this.chartScale(this.maxTaskTime)/this.OXStep); //кількість позначок по вісі ОХ
 
-    var catsUnfiltered = taskArray.map(el => el.type),
-        categories = checkUnique(catsUnfiltered).sort(),    //масив імен катеогорій(рядків)
-        tasksUnfiltered = taskArray.map(el => el.task),
-        taskNames = checkUnique(tasksUnfiltered).sort();        //масив імен усіх задач
+        this.colorScale = d3.scale.linear()                      //діапазон кольорів для задач
+            .domain([0, this.taskNames.length])
+            .range(["#00B9FA", "#F95002"])
+            .interpolate(d3.interpolateHcl);
 
-    var taskStripeVertOffset = 2,                           //відступ полоски із задачею від верхньої/нижньої меж рядка
-        gap = barHeight + taskStripeVertOffset*2,           //висота 1 рядка на діаграмі
-        leftSidePadding = 100,                              //відступ збоку для підписів осі OY
-        rightSidePadding = 100,                             //відступ справа для легенди
-        xAxisLablesH = 20,		                            //висота підписів вісі ОХ
-        legendRowH = 20,                                    //висота рядка у легенді
-        categoriesRowsH = categories.length*gap + xAxisLablesH,
-        legendRowsH = legendRowH*taskNames.length,
-        h = Math.max(categoriesRowsH, legendRowsH),         //висота діаграми
-        OXStep = 20;                                        //крок із позначками по вісі ОХ
-
-    var maxTaskTime = d3.max(taskArray, d => d.endTime),
-        chartScale = d3.scale.linear()      //масштабування із діапазону [Min ; Max]знач масиву у ширину графіка
-            .domain([0, maxTaskTime])
-            .range([0, w - rightSidePadding - leftSidePadding]);
-
-    var xAxisTicks = Math.floor(chartScale(maxTaskTime)/OXStep); //кількість позначок по вісі ОХ
-
-    var colorScale = d3.scale.linear()                      //діапазон кольорів для задач
-        .domain([0, taskNames.length])
-        .range(["#00B9FA", "#F95002"])
-        .interpolate(d3.interpolateHcl);
-
-    var svg = d3.selectAll(chartContainer)
-        .append("svg")
-        .attr("width", w)
-        .attr("height", h)
-        .attr("class", "svg");
-
-
-
-
-
-    makeGant(taskArray, w, h);
-
-    function makeGant(taskArray, pageWidth, pageHeight) {
-        makeGrid(leftSidePadding, pageWidth, pageHeight);
-        drawRects(taskArray, gap, leftSidePadding, barHeight, colorScale, pageWidth, pageHeight);
-        rowLabels(gap, leftSidePadding, barHeight);
-        drawLegend(taskNames, w, legendRowH, colorScale);
+        this.svg = d3.selectAll(this.chartContainer)
+            .append("svg")
+            .attr("width", this.w)
+            .attr("height", this.h)
+            .attr("class", "svg");
     }
 
-    function drawRects(theArray, theGap, leftSidePadding, theBarHeight, theColorScale, w, h) {
-        var bigRects = svg.append("g")
+    drawChart() {
+        this.makeGrid();
+        this.drawRects();
+        this.drawRowLabels();
+        this.drawLegend();
+    }
+
+    drawRects() {
+        var self = this;
+        var bigRects = this.svg.append("g")
             .selectAll("rect")
-            .data(categories)
+            .data(this.categories)
             .enter()
             .append("rect")
             .attr("x", 0)
-            .attr("y", function(d, i){
-                return i*theGap;
-            })
-            .attr("width", function(d) {
-                return w - rightSidePadding;
-            })
-            .attr("height", theGap)
+            .attr("y", (d, i) => i*this.gap)
+            .attr("width", d => this.w - this.rightSidePadding)
+            .attr("height", this.gap)
             .attr("class", "gantt-chart-row");
 
-        var innerRects = svg.append('g')
+        var innerRects = this.svg.append('g')
             .selectAll("rect")
-            .data(theArray)
+            .data(this.taskArray)
             .enter()
             .append("rect")
             .attr("rx", 3)
             .attr("ry", 3)
-            .attr("x", function(d){
-                return chartScale(d.startTime) + leftSidePadding;
+            .attr("x", d => this.chartScale(d.startTime) + this.leftSidePadding)
+            .attr("y", (d, i) => {
+                var categoryIndex = this.categories.findIndex(cat => cat === d.type);
+                return categoryIndex*this.gap + this.taskStripeVertOffset;
             })
-            .attr("y", function(d, i) {
-                var categoryIndex = categories.findIndex(cat => cat === d.type);
-                return categoryIndex*theGap + taskStripeVertOffset;
+            .attr("width", (d) => {
+                return this.chartScale(d.endTime) - this.chartScale(d.startTime);
             })
-            .attr("width", function(d){
-                return (chartScale(d.endTime)-chartScale(d.startTime));
-            })
-            .attr("height", theBarHeight)
-            .attr("fill", function(d){
-                for (var i = 0; i < taskNames.length; i++){
-                    if (d.task == taskNames[i]){
-                        return d3.rgb(theColorScale(i));
-                    }
-                }
+            .attr("height", this.barHeight)
+            .attr("fill", (d) => {
+                for (var i = 0; i < this.taskNames.length; i++)
+                    if (d.task == this.taskNames[i])
+                        return d3.rgb(this.colorScale(i));
             })
             .attr("class", "gantt-chart-stripe");
 
-        var tooltipHtmlStr = function(data, x, y) {
+        var tooltipHtmlStr = (data, x, y) => {
             var detailsField;
             if(data.details != undefined)
                 detailsField = `
                     <span class="gantt-chart-tooltip__title-field">
-                        ${tooltipFieldsNames.details || 'Details'}:
+                        ${this.tooltipFieldsNames.details}:
                     <\/span>  
                     ${data.task} <br/> `;
             else
                 detailsField = "";
             return `<div class="gantt-chart-tooltip" style="top: ${y}; left:${x}">
-                        <span class="gantt-chart-tooltip__title-field">${tooltipFieldsNames.task || 'Task'}:<\/span>  
+                        <span class="gantt-chart-tooltip__title-field">${this.tooltipFieldsNames.task     }:<\/span>  
                         ${data.task} <br/> 
-                        <span class="gantt-chart-tooltip__title-field">${tooltipFieldsNames.type || 'Type'       }:<\/span>  
+                        <span class="gantt-chart-tooltip__title-field">${this.tooltipFieldsNames.type     }:<\/span>  
                         ${data.type} <br/>
-                        <span class="gantt-chart-tooltip__title-field">${tooltipFieldsNames.startTime || 'Starts'}:<\/span>  
+                        <span class="gantt-chart-tooltip__title-field">${this.tooltipFieldsNames.startTime}:<\/span>  
                         ${data.startTime} <br/>
-                        <span class="gantt-chart-tooltip__title-field">${tooltipFieldsNames.endTime || 'Ends'    }:<\/span>  
+                        <span class="gantt-chart-tooltip__title-field">${this.tooltipFieldsNames.endTime   }:<\/span>  
                         ${data.endTime}
                         <span class="gantt-chart-tooltip__title-field">
                         ${detailsField}
@@ -215,7 +124,7 @@
             var x = (this.x.animVal.value + this.width.animVal.value/2) + "px";
             var y = this.y.animVal.value + 25 + "px";
 
-            document.querySelector(chartContainer)
+            document.querySelector(self.chartContainer)
                 .insertAdjacentHTML("beforeEnd", tooltipHtmlStr(d3.select(this).data()[0], x, y));
         }).on('mouseout', function() {
             var tooltips = document.getElementsByClassName("gantt-chart-tooltip");
@@ -224,17 +133,17 @@
         });
     }
 
-    function makeGrid(leftSidePadding, w, h) {
+    makeGrid() {
         var xAxis = d3.svg.axis()
-            .scale(chartScale)
+            .scale(this.chartScale)
             .orient('bottom')
-            .ticks( xAxisTicks )
-            .tickSize(h - xAxisLablesH, 0, 0)	//висота ліній - висота усієї діаграми - висота підписвів вісі ОХ
+            .ticks( this.xAxisTicks )
+            .tickSize(this.h - this.xAxisLablesH, 0, 0)	//висота ліній - висота усієї діаграми - висота підписвів вісі ОХ
             .tickFormat(d => d);
 
-        var grid = svg.append('g')
+        var grid = this.svg.append('g')
             .attr('class', 'grid')
-            .attr('transform', `translate(${leftSidePadding} , ${0})`)
+            .attr('transform', `translate(${this.leftSidePadding} , ${0})`)
             .call(xAxis)
             .selectAll("text")
             .style("text-anchor", "middle")
@@ -244,55 +153,55 @@
             .attr("dy", "1em");
     }
 
-    function rowLabels(theGap, leftSidePadding, theBarHeight, rowLabelsColor="black") {
-        var axisText = svg.append("g") //without doing this, impossible to put grid lines behind text
+    drawRowLabels() {
+        var axisText = this.svg.append("g") //without doing this, impossible to put grid lines behind text
             .selectAll("text")
-            .data(categories)
+            .data(this.categories)
             .enter()
             .append("text")
             .text(d => d)
             .attr("x", 10)
-            .attr("y", function(d, i){
-                return i*theGap;
-            })
+            .attr("y", (d, i) => i*this.gap )
             .attr("font-size", 11)
             .attr("text-anchor", "start")
             .attr("text-height", 14)
-            .attr("class", "gantt-chart-row-label")
+            .attr("class", "gantt-chart-row-label");
         //   .attr("fill", rowLabelsColor);
     }
 
-    function drawLegend(taskNames, chartW, legendRowH, theColorScale) {
-        var legendTable = svg.append("g")
+    drawLegend() {
+        var legendTable = this.svg.append("g")
             .attr("class", "legend-table");
 
         var legend = legendTable.selectAll(".legend-row")
-            .data(taskNames)
+            .data(this.taskNames)
             .enter().append("g")
             .attr("class", "legend-row")
-            .attr("transform", function(d, i) {
-                return "translate(0, " + i * legendRowH + ")";
+            .attr("transform", (d, i) => {
+                return "translate(0, " + i * this.legendRowH + ")";
             });
 
         legend.append("rect")
-            .attr("x", chartW - 10)
+            .attr("x", this.w - 10)
             .attr("y", 4)
             .attr("width", 10)
             .attr("height", 10)
             .attr("class", "legend-square")
-            .style("fill", (d, i) => d3.rgb(theColorScale(i)) );
+            .style("fill", (d, i) => d3.rgb(this.colorScale(i)) );
 
         legend.append("text")
-            .attr("x", chartW - 14)
+            .attr("x", this.w - 14)
             .attr("y", 9)
             .attr("dy", ".35em")
             .style("text-anchor", "end")
             .attr("class", "legend-text")
             .text(d => d);
     }
+}
 
-//from this stackexchange question: http://stackoverflow.com/questions/1890203/unique-for-arrays-in-javascript
-    function checkUnique(arr) {
+var utils = {
+    //from this stackexchange question: http://stackoverflow.com/questions/1890203/unique-for-arrays-in-javascript
+    checkUnique(arr) {
         var hash = {}, result = [];
         for ( var i = 0, l = arr.length; i < l; ++i ) {
             if ( !hash.hasOwnProperty(arr[i]) ) { //it works with objects! in FF, at least
@@ -301,21 +210,19 @@
             }
         }
         return result;
-    }
-
+    }//,
+/*
 //from this stackexchange question: http://stackoverflow.com/questions/14227981/count-how-many-strings-in-an-array-have-duplicates-in-the-same-array
-    function getCounts(arr) {
+    getCounts(arr) {
         var i = arr.length, // var to loop over
             obj = {}; // obj to store results
         while (i) obj[arr[--i]] = (obj[arr[i]] || 0) + 1; // count occurrences
         return obj;
-    }
+    },
 
 // get specific from everything
-    function getCount(word, arr) {
-        return getCounts(arr)[word] || 0;
+    getCount(word, arr) {
+        return this.getCounts(arr)[word] || 0;
     }
-
-
-    window.makeGant = makeGant;
-}());
+    */
+};
