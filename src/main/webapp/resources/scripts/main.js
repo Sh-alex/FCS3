@@ -76,6 +76,7 @@
     var tasksData = serverResp.map(el => {                  //Трансформований масив задач
         return {
             task: "Деталь " + el.detail,
+            shortTaskName: el.detail,
             type: "ГВМ "+ el.gvm,
             startTime: el.start,
             endTime: el.end,

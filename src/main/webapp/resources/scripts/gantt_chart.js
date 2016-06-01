@@ -73,15 +73,17 @@ class GanttChart {
             .attr("height", this.gap)
             .attr("class", "gantt-chart-row");
 
-        var innerRects = this.svg.append('g')
+        var rectangles = this.svg.append('g')
             .selectAll("rect")
             .data(this.taskArray)
-            .enter()
+            .enter();
+
+        var innerRects = rectangles
             .append("rect")
             .attr("rx", 3)
             .attr("ry", 3)
             .attr("x", d => this.chartScale(d.startTime) + this.leftSidePadding)
-            .attr("y", (d, i) => {
+            .attr("y", (d) => {
                 var categoryIndex = this.categories.findIndex(cat => cat === d.type);
                 return categoryIndex*this.gap + this.taskStripeVertOffset;
             })
@@ -95,6 +97,19 @@ class GanttChart {
                         return d3.rgb(this.colorScale(i));
             })
             .attr("class", "gantt-chart-stripe");
+
+        var rectText = rectangles.append("text")
+            .text(d => d.shortTaskName)
+            .attr("x", (d) => {
+                return (this.chartScale(d.endTime)-this.chartScale(d.startTime))/2 + this.chartScale(d.startTime) + this.leftSidePadding;
+            })
+            .attr("y", (d, i) => {
+                return Math.floor((i/this.taskArray.length)*this.categories.length)*this.gap + 14;
+            })
+            .attr("font-size", 11)
+            .attr("text-anchor", "middle")
+            .attr("text-height", this.barHeight)
+            .attr("class", "gantt-chart-stripe-label");
 
         var tooltipHtmlStr = (data, x, y) => {
             var detailsField;
@@ -120,17 +135,33 @@ class GanttChart {
                     <\/div>`;
         };
 
-        innerRects.on('mouseover', function(e) {
-            var x = (this.x.animVal.value + this.width.animVal.value/2) + "px";
-            var y = this.y.animVal.value + 25 + "px";
+        innerRects
+            .on('mouseover', function() {
+                var x = (this.x.animVal.value + this.width.animVal.value/2) + "px";
+                var y = this.y.animVal.value + 25 + "px";
 
-            document.querySelector(self.chartContainer)
-                .insertAdjacentHTML("beforeEnd", tooltipHtmlStr(d3.select(this).data()[0], x, y));
-        }).on('mouseout', function() {
-            var tooltips = document.getElementsByClassName("gantt-chart-tooltip");
-            Array.from(tooltips)
-                .forEach(el => el.remove(el));
-        });
+                document.querySelector(self.chartContainer)
+                    .insertAdjacentHTML("beforeEnd", tooltipHtmlStr(d3.select(this).data()[0], x, y));
+            })
+            .on('mouseout', function() {
+                var tooltips = document.getElementsByClassName("gantt-chart-tooltip");
+                Array.from(tooltips)
+                    .forEach(el => el.remove(el));
+            });
+
+        rectText
+            .on('mouseover', function(e) {
+                var x = this.x.animVal.getItem(this).value + "px";
+                var y = this.y.animVal.getItem(this).value + 25 + "px";
+
+                document.querySelector(self.chartContainer)
+                    .insertAdjacentHTML("beforeEnd", tooltipHtmlStr(d3.select(this).data()[0], x, y));
+            })
+            .on('mouseout', function (e) {
+                var tooltips = document.getElementsByClassName("gantt-chart-tooltip");
+                Array.from(tooltips)
+                    .forEach(el => el.remove(el));
+            });
     }
 
     makeGrid() {
@@ -211,18 +242,18 @@ var utils = {
         }
         return result;
     }//,
-/*
-//from this stackexchange question: http://stackoverflow.com/questions/14227981/count-how-many-strings-in-an-array-have-duplicates-in-the-same-array
-    getCounts(arr) {
-        var i = arr.length, // var to loop over
-            obj = {}; // obj to store results
-        while (i) obj[arr[--i]] = (obj[arr[i]] || 0) + 1; // count occurrences
-        return obj;
-    },
+    /*
+     //from this stackexchange question: http://stackoverflow.com/questions/14227981/count-how-many-strings-in-an-array-have-duplicates-in-the-same-array
+     getCounts(arr) {
+     var i = arr.length, // var to loop over
+     obj = {}; // obj to store results
+     while (i) obj[arr[--i]] = (obj[arr[i]] || 0) + 1; // count occurrences
+     return obj;
+     },
 
-// get specific from everything
-    getCount(word, arr) {
-        return this.getCounts(arr)[word] || 0;
-    }
-    */
+     // get specific from everything
+     getCount(word, arr) {
+     return this.getCounts(arr)[word] || 0;
+     }
+     */
 };
