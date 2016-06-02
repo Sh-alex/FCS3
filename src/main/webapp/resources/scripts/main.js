@@ -81,7 +81,7 @@
             $.ajax({
                     url: "/calculate",
                     type: "POST",
-                    contentType: "application/json; charset=utf-8",
+                    contentType: "application/json",
                     dataType: "json",
                     data: inpData
                 })
