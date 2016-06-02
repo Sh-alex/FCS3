@@ -5,7 +5,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import ua.fcs3.service.gantt.GanttBuilder;
-import ua.fcs3.service.gantt.GanttElement;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,7 +22,7 @@ public class IndexController {
 
     @RequestMapping(value = "/solve", method = RequestMethod.POST, consumes = "application/json")
     @ResponseBody
-    public List<List<GanttElement>> sendResult() {
+    public GanttBuilder sendResult() {
 
         List<List<Integer>> techRoutes = new ArrayList<>(new ArrayList<>(Arrays.asList(new ArrayList<>(Arrays.asList(2, 3, 1)), new ArrayList<>(Arrays.asList(2, 1, 3)),
                 new ArrayList<>(Arrays.asList(3, 1, 2)), new ArrayList<>(Arrays.asList(3, 2, 1)))));
@@ -34,8 +33,8 @@ public class IndexController {
         GanttBuilder ganttBuilder = new GanttBuilder(3, 4, techRoutes, timeOperations);
 
 
-        ganttBuilder.shortestOperation();
+        ganttBuilder.maxResidualLabor();
 
-        return ganttBuilder.getResultGantt();
+        return ganttBuilder;
     }
 }
