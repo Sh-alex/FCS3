@@ -10,6 +10,7 @@ public class GanttBuilder {
     private List<List<Integer>> techRoutes;
     private List<List<Double>> timeOperations;
     private List<List<GanttElement>> resultGantt;
+    private List<List<GanttBriefcaseElement>> resultBriefcase;
     private Integer countGvm;
     private Integer countDetails;
     private List<Double> endOperGvm;
@@ -29,33 +30,19 @@ public class GanttBuilder {
         endOper = new ArrayList<>(Collections.nCopies(countDetails, 0.0));
 
         resultGantt = new ArrayList<>();
+        resultBriefcase = new ArrayList<>();
         for (int i = 0; i < countGvm; i++) {
             resultGantt.add(new ArrayList<>());
+            resultBriefcase.add(new ArrayList<>());
         }
     }
 
-    public List<Double> getEndOperGvm() {
-        return endOperGvm;
+    public List<List<GanttBriefcaseElement>> getResultBriefcase() {
+        return resultBriefcase;
     }
 
-    public void setEndOperGvm(List<Double> endOperGvm) {
-        this.endOperGvm = endOperGvm;
-    }
-
-    public List<Double> getEndOper() {
-        return endOper;
-    }
-
-    public void setEndOper(List<Double> endOper) {
-        this.endOper = endOper;
-    }
-
-    public Integer getCountGvm() {
-        return countGvm;
-    }
-
-    public void setCountGvm(Integer countGvm) {
-        this.countGvm = countGvm;
+    public void setResultBriefcase(List<List<GanttBriefcaseElement>> resultBriefcase) {
+        this.resultBriefcase = resultBriefcase;
     }
 
     public List<List<GanttElement>> getResultGantt() {
@@ -66,21 +53,7 @@ public class GanttBuilder {
         this.resultGantt = resultGantt;
     }
 
-    public List<List<Integer>> getTechRoutes() {
-        return techRoutes;
-    }
 
-    void setTechRoutes(List<List<Integer>> techRoutes) {
-        this.techRoutes = techRoutes;
-    }
-
-    public List<List<Double>> getTimeOperations() {
-        return timeOperations;
-    }
-
-    void setTimeOperations(List<List<Double>> timeOperations) {
-        this.timeOperations = timeOperations;
-    }
 
     private List<List<Integer>> searchCandidatesOnGvm() {
 
@@ -136,9 +109,6 @@ public class GanttBuilder {
                 }
             }
 
-            for (int i = 0; i < candidatesOnGvm.size(); i++) {
-                candidatesOnGvm.get(i).subList(1, candidatesOnGvm.get(i).size()).clear();
-            }
 
             saveElement(candidatesOnGvm);
 
@@ -157,9 +127,81 @@ public class GanttBuilder {
 
     }
 
+    public void maxResidualLabor() {
+        boolean techRoutesIsEmpty = false;
+
+        while (!techRoutesIsEmpty) {
+            List<List<Integer>> candidatesOnGvm = searchCandidatesOnGvm();
+
+            for (int i = 0; i < candidatesOnGvm.size(); i++) {
+                for (int j = candidatesOnGvm.get(i).size() - 1; j >= 0; j--) {
+                    for (int k = 0; k < j; k++) {
+                        if (timeOperations.get(candidatesOnGvm.get(i).get(k)).stream().mapToDouble(Double::doubleValue).sum() <
+                                timeOperations.get(candidatesOnGvm.get(i).get(k + 1)).stream().mapToDouble(Double::doubleValue).sum()) {
+                            int temp = candidatesOnGvm.get(i).get(k);
+                            candidatesOnGvm.get(i).set(k, candidatesOnGvm.get(i).get(k + 1));
+                            candidatesOnGvm.get(i).set(k + 1, temp);
+                        }
+                    }
+                }
+            }
+
+
+            saveElement(candidatesOnGvm);
+
+            for (List<Integer> list : techRoutes) {
+                if (list.isEmpty()) {
+                    techRoutesIsEmpty = true;
+                } else {
+                    techRoutesIsEmpty = false;
+                    break;
+                }
+            }
+
+
+        }
+    }
+
+    public void minResidualLabor() {
+        boolean techRoutesIsEmpty = false;
+
+        while (!techRoutesIsEmpty) {
+            List<List<Integer>> candidatesOnGvm = searchCandidatesOnGvm();
+
+            for (int i = 0; i < candidatesOnGvm.size(); i++) {
+                for (int j = candidatesOnGvm.get(i).size() - 1; j >= 0; j--) {
+                    for (int k = 0; k < j; k++) {
+                        if (timeOperations.get(candidatesOnGvm.get(i).get(k)).stream().mapToDouble(Double::doubleValue).sum() >
+                                timeOperations.get(candidatesOnGvm.get(i).get(k + 1)).stream().mapToDouble(Double::doubleValue).sum()) {
+                            int temp = candidatesOnGvm.get(i).get(k);
+                            candidatesOnGvm.get(i).set(k, candidatesOnGvm.get(i).get(k + 1));
+                            candidatesOnGvm.get(i).set(k + 1, temp);
+                        }
+                    }
+                }
+            }
+
+
+            saveElement(candidatesOnGvm);
+
+            for (List<Integer> list : techRoutes) {
+                if (list.isEmpty()) {
+                    techRoutesIsEmpty = true;
+                } else {
+                    techRoutesIsEmpty = false;
+                    break;
+                }
+            }
+
+
+        }
+    }
+
     private void saveElement(List<List<Integer>> candidatesOnGvm) {
 
+
         for (int i = 0; i < candidatesOnGvm.size(); i++) {
+
             Integer gvm = techRoutes.get(candidatesOnGvm.get(i).get(0)).get(0);
 
             Integer detail = candidatesOnGvm.get(i).get(0);
@@ -167,6 +209,12 @@ public class GanttBuilder {
             Double start = endOperGvm.get(gvm - 1) > endOper.get(detail) ? endOperGvm.get(gvm - 1) : endOper.get(detail);
 
             Double end = start + timeOperations.get(detail).get(0);
+
+            candidatesOnGvm.get(i).replaceAll(e->e+1);
+            Collections.reverse(candidatesOnGvm.get(i));
+            resultBriefcase.get(gvm-1).add(new GanttBriefcaseElement(gvm, candidatesOnGvm.get(i), start));
+
+            //candidatesOnGvm.get(i).subList(1, candidatesOnGvm.get(i).size()).clear();
 
             resultGantt.get(gvm - 1).add(new GanttElement(gvm, detail + 1, start, end));
 
