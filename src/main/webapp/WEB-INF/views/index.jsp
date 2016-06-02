@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <title> Курсова робота з ГКС5 </title>
-    <meta name="description" content="Лабораторна робота з ГКС4 №1">
+    <meta name="description" content="Курсова робота з ГКС5">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href='../../resources/styles/bootstrap.min.css' rel='stylesheet' type='text/css'>
     <link href='../../resources/styles/main.css' rel='stylesheet' type='text/css'>

@@ -79,8 +79,10 @@
         console.log("called calcResults with data:", inpData);
         return new Promise(function(resolve, reject) {
             $.ajax({
-                    type: "POST",
                     url: "/calculate",
+                    type: "POST",
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
                     data: inpData
                 })
                 .done(function (data, textStatus) {
