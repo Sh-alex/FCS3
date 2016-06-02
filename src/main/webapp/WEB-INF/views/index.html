@@ -21,15 +21,35 @@
     <main class="container-fluid main-block">
         <div class="input-column">
             <div class="input-block">
-<!--
                 <form id="initial-data-form">
                     <div class="inp-num-of-vars">
                         <div class="form-group">
-                            <label for="select-num-x" class="control-label inp-num-of-vars__label">
-                                <strong>Кількість змінних:</strong>
+                            <label for="select-num-gvm" class="control-label inp-num-of-vars__label">
+                                <strong>Кількість ГВМ:</strong>
                             </label>
-                            <select id="select-num-x" class="form-control inp-num-of-vars__select">
-                                <option value="2" selected>2</option>
+                            <select id="select-num-gvm" name="numGVM" class="form-control inp-num-of-vars__select">
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6" selected>6</option>
+                                <option value="7">7</option>
+                                <option value="8">8</option>
+                                <option value="9">9</option>
+                                <option value="10">10</option>
+                                <option value="11">11</option>
+                                <option value="12">12</option>
+                                <option value="13">13</option>
+                                <option value="14">14</option>
+                                <option value="14">15</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="select-num-details" class="control-label inp-num-of-vars__label">
+                                <strong>Кількість деталей:</strong>
+                            </label>
+                            <select id="select-num-details" name="numDetails" class="form-control inp-num-of-vars__select">
+                                <option value="2">2</option>
                                 <option value="3">3</option>
                                 <option value="4">4</option>
                                 <option value="5">5</option>
@@ -38,106 +58,67 @@
                                 <option value="8">8</option>
                                 <option value="9">9</option>
                                 <option value="10">10</option>
+                                <option value="11">11</option>
+                                <option value="12">12</option>
+                                <option value="13">13</option>
+                                <option value="14" selected>14</option>
+                                <option value="14">15</option>
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="select-num-restrictions" class="control-label inp-num-of-vars__label">
-                                <strong>Кількість обмежень:</strong>
+                            <label for="select-calc-rule" class="control-label inp-num-of-vars__label">
+                                <strong>Правила:</strong>
                             </label>
-                            <select id="select-num-restrictions" class="form-control inp-num-of-vars__select">
-                                <option value="2">2</option>
-                                <option value="3" selected>3</option>
-                                <option value="4">4</option>
-                                <option value="5">5</option>
-                                <option value="6">6</option>
-                                <option value="7">7</option>
-                                <option value="8">8</option>
-                                <option value="9">9</option>
-                                <option value="10">10</option>
+                            <select id="select-calc-rule" name="calcRule" class="form-control inp-num-of-vars__select">
+                                <option value="shortestOp" selected>Найкоротшої операції</option>
+                                <option value="maxResidualLabor">Максимальної залишкової трудомісткості</option>
+                                <option value="minResidualLabor">Мінімальної залишкової трудомісткості</option>
                             </select>
                         </div>
                     </div>
-                    <div class="form-group inp-matrix">
-                        <strong>Введіть значення матриці:</strong>
-                        <div class="table-responsive inp-matrix__table-wrapper">
-                            <table class="table inp-matrix__table">
-                                <tbody>
-                                <tr class="inp-matrix__row">
-                                    <td class="inp-matrix__cell">
-                                        <input class="inp-matrix__input input-block__input" type="number" value="" placeholder="A11">
-                                        <span class="inp-matrix__text"> •X<sub>1</sub> </span>
-                                    </td>
-                                    <td class="inp-matrix__cell">
-                                        <input class="inp-matrix__input input-block__input" type="number" value="" placeholder="A12">
-                                        <span class="inp-matrix__text"> •X<sub>2</sub> </span>
-                                    </td>
-                                    <td class="inp-matrix__cell">
-                                        <select class="inp-block__select inp-matrix__select">
-                                            <option value="above"> ≥ </option>
-                                            <option value="below" selected> ≤ </option>
-                                        </select>
-                                    </td>
-                                    <td class="inp-matrix__cell">
-                                        <input class="inp-matrix__input input-block__input" type="number" value="" placeholder="B1">
-                                    </td>
-                                </tr>
-                                <tr class="inp-matrix__row">
-                                    <td class="inp-matrix__cell">
-                                        <input class="inp-matrix__input input-block__input" type="number" value="" placeholder="A11">
-                                        <span class="inp-matrix__text"> •X<sub>1</sub> </span>
-                                    </td>
-                                    <td class="inp-matrix__cell">
-                                        <input class="inp-matrix__input input-block__input" type="number" value="" placeholder="A12">
-                                        <span class="inp-matrix__text"> •X<sub>2</sub> </span>
-                                    </td>
-                                    <td class="inp-matrix__cell">
-                                        <select class="inp-block__select inp-matrix__select">
-                                            <option value="above"> ≥ </option>
-                                            <option value="below" selected> ≤ </option>
-                                        </select>
-                                    </td>
-                                    <td class="inp-matrix__cell">
-                                        <input class="inp-matrix__input input-block__input" type="number" value="" placeholder="B1">
-                                    </td>
-                                </tr>
-                                <tr class="inp-matrix__row">
-                                    <td class="inp-matrix__cell">
-                                        <input class="inp-matrix__input input-block__input" type="number" value="" placeholder="A11">
-                                        <span class="inp-matrix__text"> •X<sub>1</sub> </span>
-                                    </td>
-                                    <td class="inp-matrix__cell">
-                                        <input class="inp-matrix__input input-block__input" type="number" value="" placeholder="A12">
-                                        <span class="inp-matrix__text"> •X<sub>2</sub> </span>
-                                    </td>
-                                    <td class="inp-matrix__cell">
-                                        <select class="inp-block__select inp-matrix__select">
-                                            <option value="above"> ≥ </option>
-                                            <option value="below" selected> ≤ </option>
-                                        </select>
-                                    </td>
-                                    <td class="inp-matrix__cell">
-                                        <input class="inp-matrix__input input-block__input" type="number" value="" placeholder="B1">
-                                    </td>
-                                </tr>
-                                </tbody>
-                            </table>
+                    <div class="form-group inp-matrix" title="введіть цілі числа розділяючи їх проблілами, а нові рядки - символом перенесення">
+                        <div>
+                            <label for="textarea-tech-routes" class="control-label">
+                                <strong> Матриця технологічних маршрутів: </strong>
+                            </label>
                         </div>
+                        <textarea name="timeMatrix" id="textarea-tech-routes" cols="50" rows="14">
+                            2 3 1
+                            2 1 3
+                            3 1 2
+                            3 2 1
+                        </textarea>
+                    </div>
+                    <div class="form-group inp-matrix" title="введіть дійсні числа розділяючи їх проблілами, а нові рядки - символом перенесення">
+                        <div>
+                            <label for="textarea-time-matrix" class="control-label">
+                                <strong> Матриця тривалостей обробки: </strong>
+                            </label>
+                        </div>
+                        <textarea name="timeMatrix" id="textarea-time-matrix" cols="50" rows="14" >
+                            2 3 2
+                            6 1 2
+                            6 2 4
+                            4 4 5
+                        </textarea>
                     </div>
                     <div class="form-group text-center">
                         <button type="submit" class="btn btn-primary">Порахувати</button>
                     </div>
-                </form>-->
-
+                </form>
             </div>
         </div>
 
-        <div class="results-column">
+        <div class="results-column hidden" id="results-column">
             <div class="results-block">
-<!--
+                <div class="gantt-chart-wrapper">
+                    <p><strong> Діаграма послідовності обробки деталей: </strong></p>
+                    <div class="gantt-chart-container"></div>
+                </div>
                 <div class="res-matrix">
-                    <p><strong>Матриця результатів:</strong></p>
+                    <p><strong> Портфель робіт: </strong></p>
                     <div class="res-matrix__table-wrapper table-responsive">
-                        <table class="table table-striped table-bordered res-matrix__table">
+                        <table id="table-jobs-portfeil" class="table table-striped table-bordered res-matrix__table">
                             <tbody>
                             <tr class="res-matrix__row">
                                 <th> </th>
@@ -223,9 +204,6 @@
                         </table>
                     </div>
                 </div>
--->
-                <h3 class="gantt-chrt-heading"> Діаграма послідовності обробки деталей </h3>
-                <div class="gantt-chart-container"></div>
             </div>
         </div>
     </main>

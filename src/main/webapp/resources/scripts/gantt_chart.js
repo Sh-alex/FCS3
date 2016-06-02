@@ -9,9 +9,10 @@ class GanttChart {
         else
             this.taskArray = options.tasksData;
         this.w = options.w || 800;
+        this.OXStep = options.OXStep || 20;                     //крок із позначками по вісі ОХ
         this.barHeight = options.barHeight || 20;
         this.tooltipFieldsNames = options.tooltipFieldsNames || {
-                task: "Pflfxf",
+                task: "Задача",
                 type: "Категорія",
                 startTime: "Початок",
                 endTime: "Кінець",
@@ -32,7 +33,6 @@ class GanttChart {
         this.categoriesRowsH = this.categories.length*this.gap + this.xAxisLablesH;
         this.legendRowsH = this.legendRowH*this.taskNames.length;
         this.h = Math.max(this.categoriesRowsH, this.legendRowsH);         //висота діаграми
-        this.OXStep = 20;                                        //крок із позначками по вісі ОХ
 
         this.maxTaskTime = d3.max(this.taskArray, d => d.endTime);
         this.chartScale = d3.scale.linear()      //масштабування із діапазону [Min ; Max]знач масиву у ширину графіка
