@@ -1,39 +1,42 @@
 package ua.fcs3.web;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import ua.fcs3.service.gantt.DataGantt;
 import ua.fcs3.service.gantt.GanttBuilder;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 
 @Controller
 public class IndexController {
 
-    @RequestMapping(value = "/index.html", method = RequestMethod.GET)
+    @RequestMapping(value = "/index", method = RequestMethod.GET)
     public String goIndex() {
 
         return "index";
     }
 
-    @RequestMapping(value = "/solve", method = RequestMethod.POST, consumes = "application/json")
+    @RequestMapping(value = "/calculate", method = RequestMethod.POST, consumes = "application/json")
     @ResponseBody
-    public GanttBuilder sendResult() {
+    public GanttBuilder sendResult(@RequestBody DataGantt dataGantt) {
 
-        List<List<Integer>> techRoutes = new ArrayList<>(new ArrayList<>(Arrays.asList(new ArrayList<>(Arrays.asList(2, 3, 1)), new ArrayList<>(Arrays.asList(2, 1, 3)),
-                new ArrayList<>(Arrays.asList(3, 1, 2)), new ArrayList<>(Arrays.asList(3, 2, 1)))));
-
-        List<List<Double>> timeOperations = new ArrayList<>(new ArrayList<>(Arrays.asList(new ArrayList<>(Arrays.asList(2d, 3d, 2d)), new ArrayList<>(Arrays.asList(6d, 1d, 2d)),
-                new ArrayList<>(Arrays.asList(6d, 2d, 4d)), new ArrayList<>(Arrays.asList(4d, 4d, 5d)))));
-
-        GanttBuilder ganttBuilder = new GanttBuilder(3, 4, techRoutes, timeOperations);
+        GanttBuilder ganttBuilder = new GanttBuilder(dataGantt.getNumGVM(), dataGantt.getNumDetails(),
+                dataGantt.getTechRoutesMatrix(), dataGantt.getTimeMatrix());
 
 
-        ganttBuilder.maxResidualLabor();
+        switch (dataGantt.getCalcRule()) {
+            case "shortestOp":
+                ganttBuilder.shortestOperation();
+                break;
+            case "maxResidualLabor":
+                ganttBuilder.maxResidualLabor();
+                break;
+            case "minResidualLabor":
+                ganttBuilder.minResidualLabor();
+                break;
+        }
 
         return ganttBuilder;
     }
