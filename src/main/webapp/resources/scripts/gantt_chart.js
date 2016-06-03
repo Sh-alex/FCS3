@@ -46,7 +46,7 @@ class GanttChart {
             .range(["#00B9FA", "#F95002"])
             .interpolate(d3.interpolateHcl);
 
-        this.svg = d3.selectAll(this.chartContainer)
+        this.svg = d3.select(this.chartContainer)
             .append("svg")
             .attr("width", this.w)
             .attr("height", this.h)

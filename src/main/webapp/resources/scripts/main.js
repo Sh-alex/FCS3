@@ -7,7 +7,7 @@
         textareaTechRoutes = document.getElementById("textarea-tech-routes"),
         tableJobsPortfeil = document.getElementById("table-jobs-portfeil"),
         resultsBlock = document.getElementById("results-column"),
-        ganttChartContainerId = "gantt-chart-container";
+        chartContainer = document.getElementById("gantt-chart-container");
 
     var dataState = {
         inpData: {
@@ -79,13 +79,14 @@
         console.log("called calcResults with data:", inpData);
         return new Promise(function(resolve, reject) {
             $.ajax({
-                    url: "/calculate",
+                    url: "/calculate/",
                     type: "POST",
+                    dataType: 'json',
                     contentType: "application/json",
-                    dataType: "json",
-                    data: inpData
+                    data: JSON.stringify(inpData)
                 })
                 .done(function (data, textStatus) {
+                    console.log("server responded with data:", data);
                     if(!data || !(data.resultGantt instanceof Array) || !(data.resultBriefcase instanceof Array))
                         throw new Error("Некоректна відповідь сервера");
                     /* Приклад коректної відповіді
@@ -269,7 +270,7 @@
                     }; */
 
                     //перетворюємо масив задач для діаграми Ганта із 2-мірного масиву у одномірний
-                    data.resultGantt = serverResp.resultGantt.reduce( (resArr, curr) => {
+                    data.resultGantt = data.resultGantt.reduce( (resArr, curr) => {
                         resArr.push(...curr);
                         return resArr;
                     }, []);
@@ -294,12 +295,12 @@
                 }
             });
 
-        document.getElementById(ganttChartContainerId).innerHTML = "";
+        chartContainer.innerHTML = "";
         var chart = new GanttChart({
             w: 1000,
             barHeight: 20,
             OXStep: 30,
-            chartContainer: ganttChartContainerId,
+            chartContainer,
             tasksData,
             tooltipFieldsNames:  {
                 task: "Деталь",

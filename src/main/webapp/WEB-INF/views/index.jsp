@@ -114,7 +114,7 @@
             <div class="results-block">
                 <div class="gantt-chart-wrapper">
                     <p><strong> Діаграма послідовності обробки деталей: </strong></p>
-                    <div class="gantt-chart-container"></div>
+                    <div class="gantt-chart-container" id="gantt-chart-container"></div>
                 </div>
                 <div class="res-matrix">
                     <p><strong> Портфель робіт: </strong></p>
