@@ -140,8 +140,7 @@ class GanttChart {
                 var x = (this.x.animVal.value + this.width.animVal.value/2) + "px";
                 var y = this.y.animVal.value + 25 + "px";
 
-                document.querySelector(self.chartContainer)
-                    .insertAdjacentHTML("beforeEnd", tooltipHtmlStr(d3.select(this).data()[0], x, y));
+                self.chartContainer.insertAdjacentHTML("beforeEnd", tooltipHtmlStr(d3.select(this).data()[0], x, y));
             })
             .on('mouseout', function() {
                 var tooltips = document.getElementsByClassName("gantt-chart-tooltip");
@@ -154,8 +153,7 @@ class GanttChart {
                 var x = this.x.animVal.getItem(this).value + "px";
                 var y = this.y.animVal.getItem(this).value + 25 + "px";
 
-                document.querySelector(self.chartContainer)
-                    .insertAdjacentHTML("beforeEnd", tooltipHtmlStr(d3.select(this).data()[0], x, y));
+                self.chartContainer.insertAdjacentHTML("beforeEnd", tooltipHtmlStr(d3.select(this).data()[0], x, y));
             })
             .on('mouseout', function (e) {
                 var tooltips = document.getElementsByClassName("gantt-chart-tooltip");
