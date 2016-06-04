@@ -5,7 +5,7 @@
         selectCalcRule = document.getElementById("select-calc-rule"),
         textareaTimeMatrix = document.getElementById("textarea-time-matrix"),
         textareaTechRoutes = document.getElementById("textarea-tech-routes"),
-        tableJobsPortfeil = document.getElementById("table-jobs-portfeil"),
+        tableJobsBriefcase = document.getElementById("table-jobs-briefcase"),
         resultsBlock = document.getElementById("results-column"),
         chartContainer = document.getElementById("gantt-chart-container");
 
@@ -294,11 +294,134 @@
 
         chart.drawChart();
 
-        renderPortfeilTable(tableJobsPortfeil, results.resultBriefcase);
+        renderBriefcaseTable(tableJobsBriefcase, results.resultBriefcase);
     }
 
-    function renderPortfeilTable(container, data) {
-        container.innerHTML = "Табллиця з портфелем робіт" + JSON.stringify(data);
+    function renderBriefcaseTable(container, data) {
+        /*"resultBriefcase": [
+            [
+                {
+                    "gvm": 1,
+                    "details": [
+                        2
+                    ],
+                    "start": 6
+                },
+                {
+                    "gvm": 1,
+                    "details": [
+                        4,
+                        3
+                    ],
+                    "start": 10
+                },
+                {
+                    "gvm": 1,
+                    "details": [
+                        4
+                    ],
+                    "start": 12
+                },
+                {
+                    "gvm": 1,
+                    "details": [
+                        1
+                    ],
+                    "start": 17
+                }
+            ],
+            [
+                {
+                    "gvm": 2,
+                    "details": [
+                        1,
+                        2
+                    ],
+                    "start": 0
+                },
+                {
+                    "gvm": 2,
+                    "details": [
+                        1,
+                        4
+                    ],
+                    "start": 6
+                },
+                {
+                    "gvm": 2,
+                    "details": [
+                        1
+                    ],
+                    "start": 10
+                },
+                {
+                    "gvm": 2,
+                    "details": [
+                        3
+                    ],
+                    "start": 12
+                }
+            ],
+            [
+                {
+                    "gvm": 3,
+                    "details": [
+                        3,
+                        4
+                    ],
+                    "start": 0
+                },
+                {
+                    "gvm": 3,
+                    "details": [
+                        3
+                    ],
+                    "start": 4
+                },
+                {
+                    "gvm": 3,
+                    "details": [
+                        2
+                    ],
+                    "start": 10
+                },
+                {
+                    "gvm": 3,
+                    "details": [
+                        1
+                    ],
+                    "start": 12
+                }
+            ]
+        ]*/
+
+
+        let allStartsArr = [];      //масив назв по горизонталі
+        for (let i = 0; i < data.length; i++)
+            for (let el = data[i], j = 0; j < el.length; j++)
+                allStartsArr.push(el[j].start);
+        allStartsArr = checkUnique(allStartsArr).sort((a,b) => a-b);
+
+        let firstRow = `<tr>  <th></th> <th> ${allStartsArr.join("</th><th>")} </tr> </tr>`;
+        let nextRows = data.map((briefcaseRow, i) => {
+            let str = `<tr> <th> ГВМ ${briefcaseRow[0].gvm} </th>`;
+            str += allStartsArr.map((startRowName, colNum) => {
+                let briefcaseEl = briefcaseRow.find(item => item.start === startRowName);
+                if(briefcaseEl) {
+                    let dets = briefcaseEl.details,
+                        size = dets.length;
+                    if(size < 2)
+                        return `<td> <b>${dets}</b> </td>`;
+                    else
+                        return `<td> <small>${dets.slice(0, size-1).join(", ")},</small> <b>${dets[size-1]}</b> </td>`;
+                }
+                else
+                    return `<td> </td>`;
+            }).join("");
+            str += `</tr>`;
+            return str
+        }).join("");
+        container.innerHTML = firstRow + nextRows;
     }
 
     function parseStrToMatrix(str) {
@@ -315,5 +438,18 @@
                 resArr.push(parsedRowArr);
             return resArr
         }, []);
+    }
+
+
+
+    function checkUnique(arr) {
+        var hash = {}, result = [];
+        for ( var i = 0, l = arr.length; i < l; ++i ) {
+            if ( !hash.hasOwnProperty(arr[i]) ) { //it works with objects! in FF, at least
+                hash[ arr[i] ] = true;
+                result.push(arr[i]);
+            }
+        }
+        return result;
     }
 }());
