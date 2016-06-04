@@ -271,6 +271,7 @@
                     task: "Деталь " + el.detail,
                     shortTaskName: el.detail,
                     type: "ГВМ "+ el.gvm,
+                    shortTypeName: el.gvm,
                     startTime: el.start,
                     endTime: el.end
                 }
@@ -298,104 +299,6 @@
     }
 
     function renderBriefcaseTable(container, data) {
-        /*"resultBriefcase": [
-            [
-                {
-                    "gvm": 1,
-                    "details": [
-                        2
-                    ],
-                    "start": 6
-                },
-                {
-                    "gvm": 1,
-                    "details": [
-                        4,
-                        3
-                    ],
-                    "start": 10
-                },
-                {
-                    "gvm": 1,
-                    "details": [
-                        4
-                    ],
-                    "start": 12
-                },
-                {
-                    "gvm": 1,
-                    "details": [
-                        1
-                    ],
-                    "start": 17
-                }
-            ],
-            [
-                {
-                    "gvm": 2,
-                    "details": [
-                        1,
-                        2
-                    ],
-                    "start": 0
-                },
-                {
-                    "gvm": 2,
-                    "details": [
-                        1,
-                        4
-                    ],
-                    "start": 6
-                },
-                {
-                    "gvm": 2,
-                    "details": [
-                        1
-                    ],
-                    "start": 10
-                },
-                {
-                    "gvm": 2,
-                    "details": [
-                        3
-                    ],
-                    "start": 12
-                }
-            ],
-            [
-                {
-                    "gvm": 3,
-                    "details": [
-                        3,
-                        4
-                    ],
-                    "start": 0
-                },
-                {
-                    "gvm": 3,
-                    "details": [
-                        3
-                    ],
-                    "start": 4
-                },
-                {
-                    "gvm": 3,
-                    "details": [
-                        2
-                    ],
-                    "start": 10
-                },
-                {
-                    "gvm": 3,
-                    "details": [
-                        1
-                    ],
-                    "start": 12
-                }
-            ]
-        ]*/
-
-
         let allStartsArr = [];      //масив назв по горизонталі
         for (let i = 0; i < data.length; i++)
             for (let el = data[i], j = 0; j < el.length; j++)

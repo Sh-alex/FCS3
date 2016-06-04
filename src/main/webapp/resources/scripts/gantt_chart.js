@@ -19,20 +19,29 @@ class GanttChart {
                 details: "Опис"
             };
 
+        //сортуємо назви так, щоб спочатку сортувались по імені, а якщо імена співпадають, то по номеру після імені
+        function compareByNameAndNumber(t1,t2) {
+            let [,nameT1,numT1] = t1.match(/(\D+)(\d+)/i),
+                [,nameT2,numT2] = t2.match(/(\D+)(\d+)/i);
+            if((nameT1 === nameT2) && numT1 && numT2) return numT1 - numT2;
+            else return nameT1 > nameT2;
+        }
+
         this.catsUnfiltered = this.taskArray.map(el => el.type);
-        this.categories = utils.checkUnique(this.catsUnfiltered).sort();    //масив імен катеогорій(рядків)
+        this.categories = utils.checkUnique(this.catsUnfiltered).sort(compareByNameAndNumber); //масив імен катеогорій(рядків)
         this.tasksUnfiltered = this.taskArray.map(el => el.task);
-        this.taskNames = utils.checkUnique(this.tasksUnfiltered).sort();        //масив імен усіх задач
+        this.taskNames = utils.checkUnique(this.tasksUnfiltered).sort(compareByNameAndNumber); //масив імен усіх задач
 
         this.taskStripeVertOffset = 2;                           //відступ полоски із задачею від верхньої/нижньої меж рядка
-        this.gap = this.barHeight + this.taskStripeVertOffset*2;           //висота 1 рядка на діаграмі
+        this.gap = this.barHeight + this.taskStripeVertOffset*2; //висота 1 рядка на діаграмі
         this.leftSidePadding = 100;                              //відступ збоку для підписів осі OY
         this.rightSidePadding = 100;                             //відступ справа для легенди
-        this.xAxisLablesH = 20;		                            //висота підписів вісі ОХ
+        this.xAxisLablesH = 20;		                             //висота підписів вісі ОХ
         this.legendRowH = 20;                                    //висота рядка у легенді
-        this.categoriesRowsH = this.categories.length*this.gap + this.xAxisLablesH;
+        this.categoriesRowsH = this.categories.length*this.gap;
+        this.gridH = this.categoriesRowsH + this.xAxisLablesH;
         this.legendRowsH = this.legendRowH*this.taskNames.length;
-        this.h = Math.max(this.categoriesRowsH, this.legendRowsH);         //висота діаграми
+        this.h = Math.max(this.gridH, this.legendRowsH);         //висота діаграми
 
         this.maxTaskTime = d3.max(this.taskArray, d => d.endTime);
         this.chartScale = d3.scale.linear()      //масштабування із діапазону [Min ; Max]знач масиву у ширину графіка
@@ -104,7 +113,8 @@ class GanttChart {
                 return (this.chartScale(d.endTime)-this.chartScale(d.startTime))/2 + this.chartScale(d.startTime) + this.leftSidePadding;
             })
             .attr("y", (d, i) => {
-                return Math.floor((i/this.taskArray.length)*this.categories.length)*this.gap + 14;
+                var categoryIndex = this.categories.findIndex(cat => cat === d.type);
+                return categoryIndex*this.gap + this.taskStripeVertOffset;
             })
             .attr("font-size", 11)
             .attr("text-anchor", "middle")
@@ -167,7 +177,7 @@ class GanttChart {
             .scale(this.chartScale)
             .orient('bottom')
             .ticks( this.xAxisTicks )
-            .tickSize(this.h - this.xAxisLablesH, 0, 0)	//висота ліній - висота усієї діаграми - висота підписвів вісі ОХ
+            .tickSize(this.gridH - this.xAxisLablesH, 0, 0)	//висота ліній - висота усієї діаграми - висота підписвів вісі ОХ
             .tickFormat(d => d);
 
         var grid = this.svg.append('g')

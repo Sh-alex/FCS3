@@ -29,22 +29,18 @@
 
 
 
-
-
-
-
 .gantt-chart-stripe {
 
 }
-/*
+
 .gantt-chart-stripe-label {
     font-style: italic;
-    display: none;
+    dominant-baseline: hanging;
+    dominant-baseline: text-before-edge;
 }
 .gantt-chart-stripe-label:hover {
-	display: block;
 }
-*/
+
 
 .gantt-chart-row-label {
     font-size: 1em;
