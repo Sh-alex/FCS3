@@ -47,32 +47,13 @@
     });
 
     function getInpData(){
-        var inpData = {
+        return {
             numGVM: selectNumGVM.value,
             numDetails: selectNumDetails.value,
             calcRule: selectCalcRule.value,
             timeMatrix: parseStrToMatrix(textareaTimeMatrix.value),
             techRoutesMatrix: parseStrToMatrix(textareaTechRoutes.value)
         };
-
-        //Валідація введених даних
-        if(inpData.timeMatrix.length != inpData.numDetails)
-            throw new Error("timeMatrix num of rows != num of details");
-        inpData.timeMatrix = inpData.timeMatrix.map( row => {
-            if(row.length != inpData.numGVM)
-                throw new Error("timeMatrix num of cols != num of GVM");
-            return row.map( el => Number.parseFloat(el));
-        });
-
-        if(inpData.techRoutesMatrix.length != inpData.numDetails)
-            throw new Error("techRoutesMatrix num of rows != num of details");
-        inpData.techRoutesMatrix = inpData.techRoutesMatrix.map( row => {
-            if(row.length != inpData.numGVM)
-                throw new Error("techRoutesMatrix num of cols != num of GVM");
-            return row.map( el => Number.parseInt(el));
-        });
-
-        return inpData;
     }
 
     function calcResults(inpData){
