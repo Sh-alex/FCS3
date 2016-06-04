@@ -6,6 +6,7 @@
         textareaTimeMatrix = document.getElementById("textarea-time-matrix"),
         textareaTechRoutes = document.getElementById("textarea-tech-routes"),
         tableJobsBriefcase = document.getElementById("table-jobs-briefcase"),
+        tableJobsBriefcaseNames = document.getElementById("table-jobs-briefcase-names"),
         resultsBlock = document.getElementById("results-column"),
         chartContainer = document.getElementById("gantt-chart-container");
 
@@ -277,9 +278,10 @@
                 }
             });
 
+        let windowW = document.documentElement.clientWidth - 70;
         chartContainer.innerHTML = "";
         var chart = new GanttChart({
-            w: 1000,
+            w: windowW > 800 ? windowW : 800,
             barHeight: 20,
             OXStep: 30,
             chartContainer,
@@ -295,19 +297,25 @@
 
         chart.drawChart();
 
-        renderBriefcaseTable(tableJobsBriefcase, results.resultBriefcase);
+        renderBriefcaseTables(tableJobsBriefcase, tableJobsBriefcaseNames, results.resultBriefcase);
     }
 
-    function renderBriefcaseTable(container, data) {
-        let allStartsArr = [];      //масив назв по горизонталі
+    function renderBriefcaseTables(jobsContainer, jobsNamesContainer, data) {
+        //рендеримо табличку з назвами обладнання
+        jobsNamesContainer.innerHTML = `<tr> <th>Обладн./ч.п.о.</th> </tr>
+            ${data.map(briefcaseRow => "<tr> <th>ГВМ " + briefcaseRow[0].gvm + "</th></tr>").join("")}`;
+
+        //формуємо масив назв по горизонталі
+        let allStartsArr = [];
         for (let i = 0; i < data.length; i++)
             for (let el = data[i], j = 0; j < el.length; j++)
                 allStartsArr.push(el[j].start);
         allStartsArr = checkUnique(allStartsArr).sort((a,b) => a-b);
-
-        let firstRow = `<tr>  <th></th> <th> ${allStartsArr.join("</th><th>")} </tr> </tr>`;
+        
+        //рендеримо табличку з самим портфелем
+        let firstRow = `<tr> <th> ${allStartsArr.join("</th><th>")} </th> </tr>`;
         let nextRows = data.map((briefcaseRow, i) => {
-            let str = `<tr> <th> ГВМ ${briefcaseRow[0].gvm} </th>`;
+            let str = `<tr>`;
             str += allStartsArr.map((startRowName, colNum) => {
                 let briefcaseEl = briefcaseRow.find(item => item.start === startRowName);
                 if(briefcaseEl) {
@@ -324,7 +332,7 @@
             str += `</tr>`;
             return str
         }).join("");
-        container.innerHTML = firstRow + nextRows;
+        jobsContainer.innerHTML = firstRow + nextRows;
     }
 
     function parseStrToMatrix(str) {

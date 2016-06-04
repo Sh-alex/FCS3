@@ -69,11 +69,14 @@ header {
         }
 
             .res-matrix__table-wrapper{
-                padding: 2px 15px;
+              /*  padding: 2px 15px;*/
+                padding: 0;
             }
 
                 .res-matrix__table {
                     margin: 0;
+                    width: auto;
+                    float: left;
                 }
 
                     .res-matrix__row {
@@ -83,9 +86,11 @@ header {
                         .res-matrix th {
                             text-align: center;
                             padding: 8px;
+                            white-space: nowrap;
                         }
                         .res-matrix td {
                             text-align: center;
+                            white-space: nowrap;
                         }
 
 

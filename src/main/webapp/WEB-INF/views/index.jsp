@@ -138,20 +138,12 @@
                 </div>
                 <div class="res-matrix">
                     <p><strong> Портфель робіт: </strong></p>
+                    <table id="table-jobs-briefcase-names" class="table table-striped table-bordered res-matrix__table">
+
+                    </table>
                     <div class="res-matrix__table-wrapper table-responsive">
                         <table id="table-jobs-briefcase" class="table table-striped table-bordered res-matrix__table">
-                            <tbody>
-                            <tr class="res-matrix__row">
-                                <th> </th>
-                                <th> </th>
-                            </tr>
-                            <tr>
-                                <th>  </th>
-                                <td>
-                                    <span class="matrix-result-cell">  </span>
-                                </td>
-                            </tr>
-                            </tbody>
+
                         </table>
                     </div>
                 </div>
