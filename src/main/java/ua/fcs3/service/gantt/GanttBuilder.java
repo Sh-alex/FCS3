@@ -2,6 +2,8 @@ package ua.fcs3.service.gantt;
 
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 
 @Component
@@ -207,8 +209,10 @@ public class GanttBuilder {
             Integer detail = candidatesOnGvm.get(i).get(0);
 
             Double start = endOperGvm.get(gvm - 1) > endOper.get(detail) ? endOperGvm.get(gvm - 1) : endOper.get(detail);
+            start = new BigDecimal(start).setScale(2, RoundingMode.UP).doubleValue();
 
             Double end = start + timeOperations.get(detail).get(0);
+            end = new BigDecimal(end).setScale(2, RoundingMode.UP).doubleValue();
 
             candidatesOnGvm.get(i).replaceAll(e->e+1);
             Collections.reverse(candidatesOnGvm.get(i));
