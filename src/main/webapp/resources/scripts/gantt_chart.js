@@ -34,7 +34,7 @@ class GanttChart {
 
         this.taskStripeVertOffset = 2;                           //відступ полоски із задачею від верхньої/нижньої меж рядка
         this.gap = this.barHeight + this.taskStripeVertOffset*2; //висота 1 рядка на діаграмі
-        this.leftSidePadding = 100;                              //відступ збоку для підписів осі OY
+        this.leftSidePadding = 60;                              //відступ збоку для підписів осі OY
         this.rightSidePadding = 100;                             //відступ справа для легенди
         this.xAxisLablesH = 20;		                             //висота підписів вісі ОХ
         this.legendRowH = 20;                                    //висота рядка у легенді
@@ -89,8 +89,8 @@ class GanttChart {
 
         var innerRects = rectangles
             .append("rect")
-            .attr("rx", 3)
-            .attr("ry", 3)
+            .attr("rx", 2)
+            .attr("ry", 2)
             .attr("x", d => this.chartScale(d.startTime) + this.leftSidePadding)
             .attr("y", (d) => {
                 var categoryIndex = this.categories.findIndex(cat => cat === d.type);
@@ -199,7 +199,7 @@ class GanttChart {
             .enter()
             .append("text")
             .text(d => d)
-            .attr("x", 10)
+            .attr("x", 3)
             .attr("y", (d, i) => i*this.gap )
             .attr("font-size", 11)
             .attr("text-anchor", "start")
@@ -249,6 +249,9 @@ var utils = {
             }
         }
         return result;
+    },
+    getColor(i) {
+
     }//,
     /*
      //from this stackexchange question: http://stackoverflow.com/questions/14227981/count-how-many-strings-in-an-array-have-duplicates-in-the-same-array

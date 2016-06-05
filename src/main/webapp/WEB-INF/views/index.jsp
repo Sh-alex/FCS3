@@ -25,57 +25,59 @@
                 <form id="initial-data-form">
                     <div class="inp-num-of-vars">
                         <div class="form-group">
-                            <label for="select-num-gvm" class="control-label inp-num-of-vars__label">
-                                <strong>Кількість ГВМ:</strong>
-                            </label>
-                            <select id="select-num-gvm" name="numGVM" class="form-control inp-num-of-vars__select">
-                                <option value="2">2</option>
-                                <option value="3">3</option>
-                                <option value="4">4</option>
-                                <option value="5">5</option>
-                                <option value="6" selected>6</option>
-                                <option value="7">7</option>
-                                <option value="8">8</option>
-                                <option value="9">9</option>
-                                <option value="10">10</option>
-                                <option value="11">11</option>
-                                <option value="12">12</option>
-                                <option value="13">13</option>
-                                <option value="14">14</option>
-                                <option value="15">15</option>
-                            </select>
+                            <div class="col-xs-12 col-md-6">
+                                <label for="select-num-details" class="control-label inp-num-of-vars__label">
+                                    <strong>Кількість деталей:</strong>
+                                </label>
+                                <select id="select-num-details" name="numDetails" class="form-control inp-num-of-vars__select">
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                    <option value="5">5</option>
+                                    <option value="6">6</option>
+                                    <option value="7">7</option>
+                                    <option value="8">8</option>
+                                    <option value="9">9</option>
+                                    <option value="10">10</option>
+                                    <option value="11">11</option>
+                                    <option value="12">12</option>
+                                    <option value="13">13</option>
+                                    <option value="14" selected>14</option>
+                                    <option value="15">15</option>
+                                </select>
+                            </div>
+                            <div class="col-xs-12 col-md-6">
+                                <label for="select-num-gvm" class="control-label inp-num-of-vars__label">
+                                    <strong>Кількість ГВМ:</strong>
+                                </label>
+                                <select id="select-num-gvm" name="numGVM" class="form-control inp-num-of-vars__select">
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                    <option value="5">5</option>
+                                    <option value="6" selected>6</option>
+                                    <option value="7">7</option>
+                                    <option value="8">8</option>
+                                    <option value="9">9</option>
+                                    <option value="10">10</option>
+                                    <option value="11">11</option>
+                                    <option value="12">12</option>
+                                    <option value="13">13</option>
+                                    <option value="14">14</option>
+                                    <option value="15">15</option>
+                                </select>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label for="select-num-details" class="control-label inp-num-of-vars__label">
-                                <strong>Кількість деталей:</strong>
-                            </label>
-                            <select id="select-num-details" name="numDetails" class="form-control inp-num-of-vars__select">
-                                <option value="2">2</option>
-                                <option value="3">3</option>
-                                <option value="4">4</option>
-                                <option value="5">5</option>
-                                <option value="6">6</option>
-                                <option value="7">7</option>
-                                <option value="8">8</option>
-                                <option value="9">9</option>
-                                <option value="10">10</option>
-                                <option value="11">11</option>
-                                <option value="12">12</option>
-                                <option value="13">13</option>
-                                <option value="14" selected>14</option>
-                                <option value="15">15</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="select-calc-rule" class="control-label inp-num-of-vars__label">
-                                <strong>Правила:</strong>
-                            </label>
-                            <select id="select-calc-rule" name="calcRule" class="form-control inp-num-of-vars__select">
-                                <option value="shortestOp" selected>Найкоротшої операції</option>
-                                <option value="maxResidualLabor">Максимальної залишкової трудомісткості</option>
-                                <option value="minResidualLabor">Мінімальної залишкової трудомісткості</option>
-                            </select>
-                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="select-calc-rule" class="control-label inp-num-of-vars__label">
+                            <strong>Правила:</strong>
+                        </label>
+                        <select id="select-calc-rule" name="calcRule" class="form-control inp-num-of-vars__select">
+                            <option value="shortestOp" selected>Найкоротшої операції</option>
+                            <option value="maxResidualLabor">Максимальної залишкової трудомісткості</option>
+                            <option value="minResidualLabor">Мінімальної залишкової трудомісткості</option>
+                        </select>
                     </div>
                     <div class="form-group inp-matrix" title="введіть цілі числа розділяючи їх проблілами, а нові рядки - символом перенесення">
                         <div>
@@ -83,7 +85,7 @@
                                 <strong> Матриця технологічних маршрутів: </strong>
                             </label>
                         </div>
-                        <textarea name="timeMatrix" id="textarea-tech-routes" cols="50" rows="14">
+                        <textarea name="timeMatrix" id="textarea-tech-routes" class="inp-data-textarea" rows="14">
 1	4	5	3
 1	5	3	5
 1	4	5	3
@@ -106,7 +108,7 @@
                                 <strong> Матриця тривалостей обробки: </strong>
                             </label>
                         </div>
-                        <textarea name="timeMatrix" id="textarea-time-matrix" cols="50" rows="14" >
+                        <textarea name="timeMatrix" id="textarea-time-matrix" class="inp-data-textarea" rows="14" >
 11.8	20	    42.4	9.4
 11.8	42.4	9.4	    42.4
 11.8	20	    42.4	9.4
@@ -154,8 +156,7 @@
     <footer class="footer">
         <div class="navbar navbar-default">
             <p class="text-center footer__navbar-text">
-                <a href="https://vk.com/max_genash" class="navbar-link">Генаш Максим</a>,
-                <a href="https://vk.com/id52117585" class="navbar-link">Шевченко Олександр</a>
+                <a href="https://vk.com/max_genash" class="navbar-link">Генаш Максим</a> and Others
                 &copy; 2016
             </p>
         </div>

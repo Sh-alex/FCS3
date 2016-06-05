@@ -1,18 +1,19 @@
 /*Загальні стилі для всієї сторінки*/
-
+/*
 @font-face {
     font-family: comic;
     src: url("../fonts/comic.ttf");
 }
-/*
+
 body {
-  font-family: 'Merriweather',serif;
-  font-size: 16px;
-}
+    font-family: 'Merriweather',serif;
+    font-size: 16px;
+    color: #1a242f;
+}*/
 .btn, .navbar, select, select.form-control {
-  border-radius: 0
+    border-radius: 0
 }
-*/
+
 
 
 
@@ -25,12 +26,8 @@ header {
 }
 
     .header__heading{
-        color: #13daec;
         font-family: comic, cursive;
         font-weight: 300;
-        text-shadow: 0px 1px 0px #050058;
-        letter-spacing: -2px;
-        text-transform: uppercase;
     }
 
 
@@ -38,17 +35,17 @@ header {
 
 
 .main-block {
-    display: flex;
+ /*   display: flex;
     flex-wrap: wrap;
-    justify-content: space-around;
+    justify-content: space-around;*/
     min-height: calc(100% - 60px);
 }
 
     .input-column, .results-column {
         max-width: 100%;
-        display: flex;
+    /*    display: flex;
         flex-grow: 1;
-        justify-content: center;
+        justify-content: center;*/
     }
 
     .results-block, .input-block {
@@ -59,11 +56,6 @@ header {
         margin-bottom: 15px;
     }
 
-        .gantt-chrt-heading {
-            text-align: center;
-            color: rgb(0, 159, 252);            
-        }
-
         .res-matrix {
 
         }
@@ -71,6 +63,7 @@ header {
             .res-matrix__table-wrapper{
               /*  padding: 2px 15px;*/
                 padding: 0;
+                width: auto;
             }
 
                 .res-matrix__table {
@@ -85,28 +78,14 @@ header {
 
                         .res-matrix th {
                             text-align: center;
-                            padding: 8px;
                             white-space: nowrap;
+                            padding: 5px 3px !important
                         }
                         .res-matrix td {
                             text-align: center;
                             white-space: nowrap;
+                            padding: 5px 3px !important
                         }
-
-
-
-        .inp-num-of-vars {
-
-        }
-
-            .inp-num-of-vars__label {
-                width: 15em;
-            }
-
-            .inp-num-of-vars__select {
-                display: inline;
-                width: auto;
-            }
 
 
 
@@ -114,46 +93,30 @@ header {
 
         }
 
-        .inp-matrix__table-wrapper {
-            overflow-y: hidden;
-        }
-
-            .inp-matrix__table {
-                margin: 0;
-                width: auto;
+            #initial-data-form {
+                padding: 0 50px;
             }
 
-                .inp-matrix__row {
-
+                .inp-num-of-vars {
+                    margin: 0 -15px;
                 }
 
-                    .inp-matrix__cell {
-                        margin: 0;
-                        vertical-align: middle !important;
-                        padding: 8px 8px 0 0 !important;
+                    .inp-num-of-vars__label {
+
                     }
 
-                        .inp-matrix__input {
-                            height: auto;
-                            text-align: center;
-                            padding: 1px 3px;
-                            width: 5em;
-                            border-top: none;
-                            border-left: none;
-                            border-right: none;
-                        }
+                    .inp-num-of-vars__select {
 
-                        .inp-matrix__text {
+                    }
 
-                        }
+                .inp-data-textarea {
+                    width: 100%;
+                }
 
-                        .inp-matrix__select {
-                            height: auto;
-                            border: none;
-                            width: auto;
-                            cursor: pointer;
-                        }
 
+#table-jobs-briefcase-names th{
+    text-align: right;
+}
 
 
 .footer {
@@ -163,9 +126,13 @@ header {
     .footer .navbar {
         margin: 0 auto;
         border-radius: 0;
+        min-height: initial;
     }
 
         .footer__navbar-text {
             float: none;
+            color: #777;
+            padding: 10px;
+            margin: 0 auto;
         }
 
