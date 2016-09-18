@@ -1,2 +1,2 @@
-/src/main/webapp/resources/scripts/jquery-2.2.4.min.js linguist-vendored
+src/main/webapp/resources/scripts/jquery-2.2.4.min.js linguist-vendored
 src/main/webapp/resources/scripts/d3.v3.min.js linguist-vendored
