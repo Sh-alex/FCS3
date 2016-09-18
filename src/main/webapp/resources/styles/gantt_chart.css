@@ -35,7 +35,8 @@
 }
 
 .gantt-chart-stripe-label {
-    font-style: italic;
+    font-weight: bold;
+    text-shadow: white 0px 0px 5px;
     dominant-baseline: hanging;
     dominant-baseline: text-before-edge;
 }
@@ -57,7 +58,7 @@
     opacity: 0.1;
 }
 .gantt-chart-row:nth-child(odd) {
-    fill: black;
+    fill: #0000ff;
     opacity: 0.1;
 }
 
@@ -65,10 +66,9 @@
 .gantt-chart-tooltip {
     color: white;
   /*  background: #FA283D;  */
-    background: #2c3e50;
+    background: #337ab7;
     width: 150px;
     position: absolute;
-  /*  display: none;    */
     padding:3px 6px;
     margin-left: -80px;
     font-size: 11px;
@@ -83,7 +83,7 @@
     position: absolute;
     width: 0;
     border-width: 10px;
-    border-bottom-color: #2c3e50 /*#FA283D*/;
+    border-bottom-color: #337ab7 /*#FA283D*/;
     top: -20px;
 }
 
@@ -109,5 +109,5 @@
 
         .legend-text {
             font-style: italic;
-            fill: #484848;
+            fill: #001b2f;
         }

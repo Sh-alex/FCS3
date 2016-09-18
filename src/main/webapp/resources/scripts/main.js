@@ -283,7 +283,7 @@
         var chart = new GanttChart({
             w: windowW > 800 ? windowW : 800,
             barHeight: 20,
-            OXStep: 30,
+            OXStep: 40,
             chartContainer,
             tasksData,
             tooltipFieldsNames:  {
